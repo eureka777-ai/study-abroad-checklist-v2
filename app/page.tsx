@@ -746,8 +746,14 @@ export default function HomePage() {
   }
 
   function toggleTemplatePreview(template: (typeof templateCards)[number]) {
-    setMessage("");
-    setPreviewTemplate((current) => current?.title === template.title ? null : template);
+    const shouldOpen = previewTemplate?.title !== template.title;
+    setPreviewTemplate(shouldOpen ? template : null);
+    setMessage(shouldOpen ? `正在预览「${template.title}」。` : `已收起「${template.title}」预览。`);
+    if (shouldOpen) {
+      window.setTimeout(() => {
+        document.getElementById("template-preview")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 80);
+    }
   }
 
   async function saveMaterial(event: FormEvent) {
@@ -772,12 +778,14 @@ export default function HomePage() {
     setForm(defaultForm);
     setEditingId(null);
     await loadUserData(session);
+    setMessage(editingId ? "材料已保存。" : "材料已添加。");
   }
 
   async function deleteMaterial(id: string) {
     if (!session || !window.confirm("确定删除这项材料吗？")) return;
     await apiRequest(`materials?id=eq.${id}`, session.access_token, { method: "DELETE" });
     await loadUserData(session);
+    setMessage("材料已删除。");
   }
 
   function toggleSelectMaterial(id: string) {
@@ -836,6 +844,7 @@ export default function HomePage() {
   function startEdit(material: Material) {
     setBulkMode(false);
     setEditingId(material.id);
+    setMessage(`正在编辑「${material.name}」。`);
     setForm({
       name: material.name,
       category: material.category,
@@ -1015,7 +1024,7 @@ export default function HomePage() {
           <h1>我的材料路径</h1>
           <p className="subtle">按国家、申请阶段、签证类型和行前任务整理材料。你更新进度，家人只读查看。</p>
           <div className="quick-actions">
-            <button className="button button-primary" type="button" onClick={addSeedMaterials}>添加默认材料</button>
+            <button className="button button-primary" type="button" onClick={addSeedMaterials} disabled={busyTemplate === "默认材料"}>{busyTemplate === "默认材料" ? "添加中..." : "添加默认材料"}</button>
             <button className="button button-soft" type="button" onClick={copyShareUrl}>复制分享链接</button>
             <button className="button button-plain" type="button" onClick={logout}>退出登录</button>
           </div>
@@ -1064,7 +1073,7 @@ export default function HomePage() {
         <div className="next-step-actions">
           {nextMaterial?.source_url && <a className="button button-soft" href={nextMaterial.source_url} target="_blank" rel="noopener noreferrer">官方入口</a>}
           {nextMaterial && <button className="button button-primary" type="button" onClick={() => quickConfirm(nextMaterial)}>一键确认</button>}
-          {!materials.length && <button className="button button-primary" type="button" onClick={addSeedMaterials}>添加默认材料</button>}
+          {!materials.length && <button className="button button-primary" type="button" onClick={addSeedMaterials} disabled={busyTemplate === "默认材料"}>{busyTemplate === "默认材料" ? "添加中..." : "添加默认材料"}</button>}
         </div>
       </section>
 
@@ -1113,7 +1122,7 @@ export default function HomePage() {
           </div>
         )}
         {previewTemplate && (
-          <div className="template-preview">
+          <div className="template-preview" id="template-preview">
             <div className="template-preview-head">
               <div>
                 <p className="eyebrow">Preview</p>
@@ -1142,9 +1151,9 @@ export default function HomePage() {
         {message && <p className="feedback">{message}</p>}
       </details>
 
-      <details className="card panel add-panel" open={Boolean(editingId)}>
+      {!editingId && <details className="card panel add-panel">
         <summary>
-          <span>{editingId ? "编辑材料" : "手动添加材料"}</span>
+          <span>手动添加材料</span>
           <small>展开表单</small>
         </summary>
         <form className="grid-form" onSubmit={saveMaterial}>
@@ -1159,10 +1168,39 @@ export default function HomePage() {
           <label className="label col-span-full md:col-span-2">下一步动作<textarea className="input" rows={3} value={form.next_action} onChange={(e) => setForm({ ...form, next_action: e.target.value })} /></label>
           <label className="label col-span-full md:col-span-2">适用情况<textarea className="input" rows={3} value={form.applies_to} onChange={(e) => setForm({ ...form, applies_to: e.target.value })} /></label>
           <label className="label col-span-full">备注<textarea className="input" rows={3} value={form.note} onChange={(e) => setForm({ ...form, note: e.target.value })} /></label>
-          <button className="button button-primary" type="submit">{editingId ? "保存修改" : "添加材料"}</button>
-          {editingId && <button className="button button-soft" type="button" onClick={() => { setEditingId(null); setForm(defaultForm); }}>取消编辑</button>}
+          <button className="button button-primary" type="submit">添加材料</button>
         </form>
-      </details>
+      </details>}
+
+      {editingId && (
+        <div className="modal-backdrop" role="dialog" aria-modal="true" aria-label="编辑材料">
+          <div className="edit-modal">
+            <div className="edit-modal-head">
+              <div>
+                <p className="eyebrow">Edit Material</p>
+                <h2>编辑材料</h2>
+                <p>修改后点击保存，内容会立刻同步到你的清单。</p>
+              </div>
+              <button className="button button-soft" type="button" onClick={() => { setEditingId(null); setForm(defaultForm); setMessage("已取消编辑。"); }}>关闭</button>
+            </div>
+            <form className="grid-form" onSubmit={saveMaterial}>
+              <label className="label">材料名称<input className="input" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required /></label>
+              <Select label="分类" value={form.category} options={categories} onChange={(value) => setForm({ ...form, category: value })} />
+              <Select label="阶段" value={form.stage} options={stages} onChange={(value) => setForm({ ...form, stage: value })} />
+              <Select label="状态" value={form.status} options={statuses} onChange={(value) => setForm({ ...form, status: value })} />
+              <Select label="重要程度" value={form.requirement_level} options={levels} onChange={(value) => setForm({ ...form, requirement_level: value })} />
+              <label className="label">截止日期<input className="input" type="date" value={form.deadline} onChange={(e) => setForm({ ...form, deadline: e.target.value })} /></label>
+              <label className="label">来源名称<input className="input" value={form.source_name} onChange={(e) => setForm({ ...form, source_name: e.target.value })} /></label>
+              <label className="label">官方入口<input className="input" value={form.source_url} onChange={(e) => setForm({ ...form, source_url: e.target.value })} /></label>
+              <label className="label col-span-full md:col-span-2">下一步动作<textarea className="input" rows={3} value={form.next_action} onChange={(e) => setForm({ ...form, next_action: e.target.value })} /></label>
+              <label className="label col-span-full md:col-span-2">适用情况<textarea className="input" rows={3} value={form.applies_to} onChange={(e) => setForm({ ...form, applies_to: e.target.value })} /></label>
+              <label className="label col-span-full">备注<textarea className="input" rows={3} value={form.note} onChange={(e) => setForm({ ...form, note: e.target.value })} /></label>
+              <button className="button button-primary" type="submit">保存修改</button>
+              <button className="button button-soft" type="button" onClick={() => { setEditingId(null); setForm(defaultForm); setMessage("已取消编辑。"); }}>取消</button>
+            </form>
+          </div>
+        </div>
+      )}
 
       <details className="card panel section-details" open>
         <summary className="section-summary">
@@ -1244,6 +1282,7 @@ export default function HomePage() {
           })}
         </div>
       </details>
+      {message && <div className="toast-feedback" role="status">{message}</div>}
     </main>
   );
 }

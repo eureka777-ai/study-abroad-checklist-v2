@@ -107,6 +107,12 @@ textarea {
   transform: translateY(-1px);
 }
 
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  transform: none;
+}
+
 .button-primary {
   background: var(--primary);
   color: white;
@@ -1026,6 +1032,65 @@ textarea {
   padding: 24px 28px 28px;
 }
 
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  background: rgba(245, 245, 247, 0.72);
+  padding: 18px;
+  backdrop-filter: blur(18px);
+}
+
+.edit-modal {
+  width: min(980px, 100%);
+  max-height: min(86vh, 860px);
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.18);
+  padding: 26px;
+}
+
+.edit-modal-head {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.edit-modal-head h2 {
+  margin: 0;
+  color: var(--text);
+  font-size: clamp(28px, 4vw, 42px);
+  line-height: 1.05;
+}
+
+.edit-modal-head p:not(.eyebrow) {
+  margin: 8px 0 0;
+  color: var(--muted);
+}
+
+.toast-feedback {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 60;
+  max-width: min(420px, calc(100% - 44px));
+  border: 1px solid rgba(0, 113, 227, 0.14);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.94);
+  color: var(--text);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.14);
+  padding: 13px 16px;
+  font-size: 14px;
+  font-weight: 700;
+  backdrop-filter: blur(18px);
+}
+
 .progress-fill {
   height: 100%;
   border-radius: inherit;
@@ -1140,6 +1205,21 @@ textarea {
 
   .template-preview-head {
     display: grid;
+  }
+
+  .edit-modal {
+    max-height: 90vh;
+    padding: 20px;
+  }
+
+  .edit-modal-head {
+    display: grid;
+  }
+
+  .toast-feedback {
+    right: 12px;
+    bottom: 12px;
+    max-width: calc(100% - 24px);
   }
 
   .bulk-toolbar {
