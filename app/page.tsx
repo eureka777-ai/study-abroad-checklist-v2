@@ -626,9 +626,9 @@ export default function HomePage() {
       requiredTotal: required.length,
       readyRequired,
       percent: required.length ? Math.round((readyRequired / required.length) * 100) : 0,
-      done: materials.filter((item) => item.status === "已完成").length,
-      uploaded: materials.filter((item) => item.status === "已上传").length,
-      confirmed: materials.filter((item) => item.status === "已确认").length,
+      done: required.filter((item) => item.status === "已完成").length,
+      uploaded: required.filter((item) => item.status === "已上传").length,
+      confirmed: required.filter((item) => item.status === "已确认").length,
       notApplicable: materials.filter((item) => item.status === "不适用").length
     };
   }, [materials]);
