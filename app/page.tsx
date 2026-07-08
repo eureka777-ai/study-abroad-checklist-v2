@@ -879,8 +879,8 @@ export default function HomePage() {
       <main className="page">
         <section className="hero hero-landing">
           <div className="hero-copy">
-            <p className="eyebrow">Study Abroad Planner</p>
-            <h1>留学与签证材料助手</h1>
+            <p className="eyebrow">Pathfolio</p>
+            <h1>你的跨国材料路径</h1>
             <p className="subtle">从学校申请到学生签证、旅游签、住宿和行前准备，把跨国材料整理成一个清晰的进度页。</p>
             <div className="feature-strip" aria-label="核心功能">
               <span>全球模板库</span>
@@ -985,8 +985,8 @@ export default function HomePage() {
     <main className="page dashboard-page">
       <section className="dashboard-hero">
         <div className="dashboard-copy">
-          <p className="eyebrow">Study Abroad Planner</p>
-          <h1>我的留学材料</h1>
+          <p className="eyebrow">Pathfolio</p>
+          <h1>我的材料路径</h1>
           <p className="subtle">按国家、申请阶段、签证类型和行前任务整理材料。你更新进度，家人只读查看。</p>
           <div className="quick-actions">
             <button className="button button-primary" type="button" onClick={addSeedMaterials}>添加默认材料</button>

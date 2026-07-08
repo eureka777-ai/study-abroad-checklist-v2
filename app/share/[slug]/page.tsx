@@ -80,8 +80,8 @@ export default function SharePage() {
     <main className="page">
       <section className="hero">
         <div>
-          <p className="eyebrow">Family View</p>
-          <h1>{profile?.display_name || "留学材料"}的进度</h1>
+          <p className="eyebrow">Pathfolio · Family View</p>
+          <h1>{profile?.display_name || "我的材料路径"}的进度</h1>
           <p className="subtle">这是只读分享页，可以查看最新材料状态，但不能修改你的清单。</p>
         </div>
         <div className="card panel">

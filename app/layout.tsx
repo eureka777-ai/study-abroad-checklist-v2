@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "留学材料助手",
-  description: "账号版留学材料 Checklist，支持家庭只读分享。"
+  title: "Pathfolio",
+  description: "留学、签证和行前材料路径管理工具。"
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
