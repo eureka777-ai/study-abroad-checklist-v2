@@ -1121,6 +1121,18 @@ textarea {
   padding: 26px;
 }
 
+.template-import-modal {
+  width: min(680px, 100%);
+  max-height: min(82vh, 760px);
+  overflow: auto;
+  overscroll-behavior: contain;
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.18);
+  padding: 26px;
+}
+
 .share-modal-head {
   display: flex;
   align-items: start;
@@ -1234,6 +1246,44 @@ textarea {
   white-space: nowrap;
   font-family: inherit;
   font-weight: 650;
+}
+
+.custom-template-list {
+  display: grid;
+  gap: 12px;
+}
+
+.custom-template-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.82);
+  padding: 16px;
+}
+
+.custom-template-card strong {
+  display: block;
+  color: var(--text);
+  font-size: 18px;
+}
+
+.custom-template-card p {
+  margin: 4px 0 0;
+  color: var(--muted);
+}
+
+.custom-template-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.modal-empty-state {
+  margin: 0;
 }
 
 .toast-feedback {
@@ -1452,6 +1502,18 @@ textarea {
 
   .share-modal {
     padding: 20px;
+  }
+
+  .template-import-modal {
+    padding: 20px;
+  }
+
+  .custom-template-card {
+    grid-template-columns: 1fr;
+  }
+
+  .custom-template-actions {
+    justify-content: flex-start;
   }
 
   .bulk-toolbar {

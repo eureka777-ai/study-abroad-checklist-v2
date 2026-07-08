@@ -32,9 +32,32 @@ type Material = {
   applies_to: string | null;
 };
 
+type TemplateMaterial = {
+  name: string;
+  category: string;
+  stage: string;
+  status?: string;
+  requirement_level?: string;
+  deadline?: string | null;
+  note?: string | null;
+  source_name?: string | null;
+  source_url?: string | null;
+  how_to_get?: string | null;
+  next_action?: string | null;
+  applies_to?: string | null;
+};
+
+type CustomTemplate = {
+  id: string;
+  title: string;
+  createdAt: string;
+  materials: TemplateMaterial[];
+};
+
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 const FEEDBACK_URL = "https://example.com/feedback";
+const CUSTOM_TEMPLATE_PREFIX = "pathfolio-custom-templates";
 
 const statuses = ["未开始", "准备中", "已完成", "已上传", "已确认", "不适用"];
 const categories = ["申请材料", "学术材料", "语言材料", "签证材料", "住宿材料", "付款材料", "其他"];
@@ -581,6 +604,27 @@ function isValidUrl(value: string) {
   }
 }
 
+function getCustomTemplateKey(userId?: string) {
+  return `${CUSTOM_TEMPLATE_PREFIX}-${userId || "guest"}`;
+}
+
+function materialToTemplateItem(material: Material): TemplateMaterial {
+  return {
+    name: material.name,
+    category: material.category,
+    stage: material.stage || "其他",
+    status: "未开始",
+    requirement_level: material.requirement_level,
+    deadline: null,
+    note: "",
+    source_name: material.source_name,
+    source_url: material.source_url,
+    how_to_get: material.how_to_get,
+    next_action: material.next_action,
+    applies_to: material.applies_to
+  };
+}
+
 async function apiRequest<T>(path: string, token: string, options: RequestInit = {}): Promise<T> {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
     ...options,
@@ -607,6 +651,8 @@ export default function HomePage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [templateImportOpen, setTemplateImportOpen] = useState(false);
+  const [customTemplates, setCustomTemplates] = useState<CustomTemplate[]>([]);
   const [authMode, setAuthMode] = useState<"login" | "signup" | "forgot">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -640,13 +686,15 @@ export default function HomePage() {
   useEffect(() => {
     if (!session) return;
     void loadUserData(session);
+    const savedTemplates = window.localStorage.getItem(getCustomTemplateKey(session.user.id));
+    setCustomTemplates(savedTemplates ? JSON.parse(savedTemplates) as CustomTemplate[] : []);
   }, [session]);
 
   useEffect(() => {
-    const hasOpenModal = addModalOpen || shareModalOpen || Boolean(editingId);
+    const hasOpenModal = addModalOpen || shareModalOpen || templateImportOpen || Boolean(editingId);
     document.body.classList.toggle("modal-open", hasOpenModal);
     return () => document.body.classList.remove("modal-open");
-  }, [addModalOpen, shareModalOpen, editingId]);
+  }, [addModalOpen, shareModalOpen, templateImportOpen, editingId]);
 
   const stats = useMemo(() => {
     const applicable = materials.filter((item) => item.status !== "不适用");
@@ -813,7 +861,7 @@ export default function HomePage() {
     }
   }
 
-  async function addMaterialsFromTemplate(items = seedMaterials, label = "默认材料") {
+  async function addMaterialsFromTemplate(items: TemplateMaterial[] = seedMaterials, label = "默认材料") {
     if (!session) return;
     setBusyTemplate(label);
     setMessage(`正在添加「${label}」...`);
@@ -851,6 +899,43 @@ export default function HomePage() {
 
   async function addSeedMaterials() {
     await addMaterialsFromTemplate(seedMaterials, "默认材料");
+  }
+
+  function persistCustomTemplates(nextTemplates: CustomTemplate[]) {
+    if (!session) return;
+    window.localStorage.setItem(getCustomTemplateKey(session.user.id), JSON.stringify(nextTemplates));
+    setCustomTemplates(nextTemplates);
+  }
+
+  function saveCurrentAsTemplate() {
+    if (!session) return;
+    if (!materials.length) {
+      toast.info("现在还没有材料可以保存为模板");
+      return;
+    }
+    const title = window.prompt("给这个模板起个名字", "我的材料模板");
+    if (!title?.trim()) return;
+    const nextTemplate: CustomTemplate = {
+      id: `${Date.now()}`,
+      title: title.trim(),
+      createdAt: new Date().toISOString(),
+      materials: materials.map(materialToTemplateItem)
+    };
+    const nextTemplates = [nextTemplate, ...customTemplates].slice(0, 12);
+    persistCustomTemplates(nextTemplates);
+    toast.success("模板已保存");
+  }
+
+  async function importCustomTemplate(template: CustomTemplate) {
+    await addMaterialsFromTemplate(template.materials, template.title);
+    setTemplateImportOpen(false);
+  }
+
+  function deleteCustomTemplate(templateId: string) {
+    if (!window.confirm("确定要删除这个自定义模板吗？")) return;
+    const nextTemplates = customTemplates.filter((template) => template.id !== templateId);
+    persistCustomTemplates(nextTemplates);
+    toast.success("模板已删除");
   }
 
   function toggleTemplatePreview(template: (typeof templateCards)[number]) {
@@ -1212,7 +1297,6 @@ export default function HomePage() {
           <h1>我的材料路径</h1>
           <p className="subtle">按国家、申请阶段、签证类型和行前任务整理材料。你更新进度，家人只读查看。</p>
           <div className="quick-actions">
-            <button className="button button-primary" type="button" onClick={addSeedMaterials} disabled={busyTemplate === "默认材料"}>{busyTemplate === "默认材料" ? "添加中..." : "添加默认材料"}</button>
             <button className="button button-plain" type="button" onClick={logout}>退出登录</button>
           </div>
         </div>
@@ -1255,7 +1339,7 @@ export default function HomePage() {
         <div className="next-step-actions">
           {nextMaterial?.source_url && <a className="button button-soft" href={nextMaterial.source_url} target="_blank" rel="noopener noreferrer">官方入口</a>}
           {nextMaterial && <button className="button button-primary" type="button" onClick={() => quickConfirm(nextMaterial)}>一键确认</button>}
-          {!materials.length && <button className="button button-primary" type="button" onClick={addSeedMaterials} disabled={busyTemplate === "默认材料"}>{busyTemplate === "默认材料" ? "添加中..." : "添加默认材料"}</button>}
+          {!materials.length && <button className="button button-primary" type="button" onClick={() => document.querySelector(".template-grid")?.scrollIntoView({ behavior: "smooth", block: "start" })}>去选择模板</button>}
         </div>
       </section>
 
@@ -1393,6 +1477,45 @@ export default function HomePage() {
         </div>
       )}
 
+      {templateImportOpen && (
+        <div className="modal-backdrop" role="dialog" aria-modal="true" aria-label="导入自定义模板">
+          <div className="template-import-modal">
+            <div className="share-modal-head">
+              <div>
+                <h2>导入模板</h2>
+                <p>把你保存过的个性化模板，一键放进当前清单。已有同名材料会自动跳过。</p>
+              </div>
+              <button className="icon-close" type="button" onClick={() => setTemplateImportOpen(false)} aria-label="关闭导入模板弹窗">×</button>
+            </div>
+            {customTemplates.length ? (
+              <div className="custom-template-list">
+                {customTemplates.map((template) => (
+                  <article className="custom-template-card" key={template.id}>
+                    <div>
+                      <strong>{template.title}</strong>
+                      <p>{template.materials.length} 项材料 · {new Date(template.createdAt).toLocaleDateString("zh-CN")}</p>
+                    </div>
+                    <div className="custom-template-actions">
+                      <button className="button button-primary" type="button" onClick={() => importCustomTemplate(template)}>导入</button>
+                      <button className="button button-plain" type="button" onClick={() => deleteCustomTemplate(template.id)}>删除</button>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            ) : (
+              <div className="empty-state modal-empty-state">
+                <span className="empty-icon">+</span>
+                <strong>还没有自定义模板</strong>
+                <p>先在“我的清单”里整理好材料，然后点击“保存模板”。</p>
+                <div className="empty-actions">
+                  <button className="button button-soft" type="button" onClick={() => setTemplateImportOpen(false)}>回到清单</button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {editingId && (
         <div className="modal-backdrop" role="dialog" aria-modal="true" aria-label="编辑材料">
           <div className="edit-modal">
@@ -1427,6 +1550,26 @@ export default function HomePage() {
               }}
             >
               {bulkMode ? "退出批量" : "批量管理"}
+            </button>
+            <button
+              className="button button-soft"
+              type="button"
+              onClick={(event) => {
+                event.preventDefault();
+                saveCurrentAsTemplate();
+              }}
+            >
+              保存模板
+            </button>
+            <button
+              className="button button-soft"
+              type="button"
+              onClick={(event) => {
+                event.preventDefault();
+                setTemplateImportOpen(true);
+              }}
+            >
+              导入模板
             </button>
             <button
               className="button add-material-button"
