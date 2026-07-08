@@ -643,6 +643,12 @@ export default function HomePage() {
     void loadUserData(session);
   }, [session]);
 
+  useEffect(() => {
+    const hasOpenModal = addModalOpen || Boolean(editingId);
+    document.body.classList.toggle("modal-open", hasOpenModal);
+    return () => document.body.classList.remove("modal-open");
+  }, [addModalOpen, editingId]);
+
   const stats = useMemo(() => {
     const applicable = materials.filter((item) => item.status !== "不适用");
     const required = applicable.filter((item) => item.requirement_level === "必需");
@@ -1266,7 +1272,7 @@ export default function HomePage() {
             <p className="eyebrow">Templates</p>
             <h2 className="section-title">选择模板</h2>
           </div>
-          <span>收起 / 展开</span>
+          <span className="collapse-icon" aria-hidden="true" />
         </summary>
         <p className="section-note">点一下模板先预览材料；再点同一个模板可收起预览。可以先用筛选缩小范围，再添加到正式清单。</p>
         <div className="template-filters" aria-label="模板筛选">
@@ -1343,6 +1349,7 @@ export default function HomePage() {
       {addModalOpen && (
         <div className="modal-backdrop" role="dialog" aria-modal="true" aria-label="添加材料">
           <div className="edit-modal">
+            <div className="modal-drag-handle" aria-hidden="true" />
             <div className="edit-modal-head">
               <div>
                 <p className="eyebrow">New Material</p>
@@ -1359,6 +1366,7 @@ export default function HomePage() {
       {editingId && (
         <div className="modal-backdrop" role="dialog" aria-modal="true" aria-label="编辑材料">
           <div className="edit-modal">
+            <div className="modal-drag-handle" aria-hidden="true" />
             <div className="edit-modal-head">
               <div>
                 <p className="eyebrow">Edit Material</p>
@@ -1380,6 +1388,17 @@ export default function HomePage() {
           </div>
           <div className="section-summary-actions">
             <button
+              className="button button-soft"
+              type="button"
+              onClick={(event) => {
+                event.preventDefault();
+                setBulkMode(!bulkMode);
+                setSelectedIds([]);
+              }}
+            >
+              {bulkMode ? "退出批量" : "批量管理"}
+            </button>
+            <button
               className="button add-material-button"
               type="button"
               onClick={(event) => {
@@ -1389,7 +1408,7 @@ export default function HomePage() {
             >
               ＋ 添加材料
             </button>
-            <span>收起 / 展开</span>
+            <span className="collapse-icon" aria-hidden="true" />
           </div>
         </summary>
         <div className="bulk-toolbar">
@@ -1398,7 +1417,6 @@ export default function HomePage() {
             <p>{bulkMode ? "勾选材料后可以统一修改状态或删除。" : "开启批量管理后，可以一次处理多项材料。"}</p>
           </div>
           <div className="bulk-actions">
-            <button className="button button-soft" type="button" onClick={() => { setBulkMode(!bulkMode); setSelectedIds([]); }}>{bulkMode ? "退出批量" : "批量管理"}</button>
             {bulkMode && (
               <>
                 <button className="button button-soft" type="button" onClick={toggleSelectAll}>{selectedIds.length === materials.length ? "取消全选" : "全选"}</button>
