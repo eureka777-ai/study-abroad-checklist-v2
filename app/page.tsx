@@ -120,6 +120,96 @@ const templateCards = [
       { name: "接机 / 到校注册信息", category: "其他", stage: "到校注册", next_action: "保存学校注册、接机或报到安排。" },
       { name: "eVisa / BRP 信息", category: "签证材料", stage: "到校注册", requirement_level: "视情况需要", next_action: "根据签证获批邮件确认线上身份或 BRP 领取方式。" }
     ]
+  },
+  {
+    title: "申根旅游签（在职）",
+    description: "适合有工作、计划去申根区短期旅行的人。",
+    meta: "行程 · 在职 · 资金",
+    materials: [
+      { name: "申根签证申请表", category: "签证材料", stage: "申请准备", next_action: "按主要目的国或停留最久国家的签证中心要求填写。", source_name: "EU Schengen visa guidance", source_url: "https://home-affairs.ec.europa.eu/policies/schengen/visa-policy/applying-schengen-visa_en" },
+      { name: "护照及旧护照", category: "签证材料", stage: "申请准备", next_action: "检查有效期、空白页和旧签证记录。" },
+      { name: "申根旅行保险", category: "签证材料", stage: "提交申请", next_action: "购买覆盖申根区和完整旅行日期的保险。" },
+      { name: "往返机票预订单", category: "签证材料", stage: "提交申请", next_action: "准备与行程一致的机票预订单。" },
+      { name: "酒店预订单 / 住宿证明", category: "住宿材料", stage: "提交申请", next_action: "准备覆盖全程的住宿证明。" },
+      { name: "英文在职证明", category: "签证材料", stage: "提交申请", next_action: "向公司申请盖章版在职证明和准假说明。", applies_to: "在职申请人常用。" },
+      { name: "银行流水 / 资金证明", category: "签证材料", stage: "提交申请", next_action: "按目的国签证中心要求准备近几个月流水或存款证明。" }
+    ]
+  },
+  {
+    title: "申根旅游签（学生）",
+    description: "适合在读学生去欧洲短期旅行。",
+    meta: "在读 · 亲属资助 · 行程",
+    materials: [
+      { name: "申根签证申请表", category: "签证材料", stage: "申请准备", next_action: "按目的国签证中心要求填写并预约。", source_name: "EU Schengen visa guidance", source_url: "https://home-affairs.ec.europa.eu/policies/schengen/visa-policy/applying-schengen-visa_en" },
+      { name: "在读证明", category: "学术材料", stage: "提交申请", next_action: "向学校申请英文在读证明或中英文版本。" },
+      { name: "学生证 / 学校证明", category: "学术材料", stage: "提交申请", next_action: "按签证中心要求准备复印件或翻译件。" },
+      { name: "父母资金证明", category: "签证材料", stage: "提交申请", next_action: "如由父母资助，准备父母流水、关系证明和资助说明。" },
+      { name: "旅行保险", category: "签证材料", stage: "提交申请", next_action: "购买符合申根要求的旅行保险。" },
+      { name: "行程单", category: "签证材料", stage: "提交申请", next_action: "列出城市、日期、交通和住宿安排。" }
+    ]
+  },
+  {
+    title: "申根商务签",
+    description: "适合会议、展会、商务拜访等短期访问。",
+    meta: "邀请函 · 在职 · 行程",
+    materials: [
+      { name: "商务邀请函", category: "签证材料", stage: "提交申请", next_action: "向欧洲邀请方索取含访问目的、日期和联系人信息的邀请函。" },
+      { name: "派遣函 / 在职证明", category: "签证材料", stage: "提交申请", next_action: "由所在公司出具派遣说明、职位、收入和费用承担信息。" },
+      { name: "营业执照 / 公司证明", category: "签证材料", stage: "提交申请", next_action: "按签证中心要求准备公司资质文件。" },
+      { name: "申根签证申请表", category: "签证材料", stage: "申请准备", next_action: "按主要目的国要求填写。", source_name: "EU Schengen visa guidance", source_url: "https://home-affairs.ec.europa.eu/policies/schengen/visa-policy/applying-schengen-visa_en" },
+      { name: "旅行保险", category: "签证材料", stage: "提交申请", next_action: "购买覆盖商务行程的申根旅行保险。" }
+    ]
+  },
+  {
+    title: "日本旅游签",
+    description: "适合赴日短期旅游，材料按所在地领区确认。",
+    meta: "申请表 · 财力 · 行程",
+    materials: [
+      { name: "日本签证申请表", category: "签证材料", stage: "申请准备", next_action: "按日本使领馆或指定代办机构要求填写。", source_name: "Japan MOFA visa information", source_url: "https://www.mofa.go.jp/j_info/visit/visa/index.html" },
+      { name: "护照", category: "签证材料", stage: "申请准备", next_action: "检查有效期和空白页。" },
+      { name: "照片", category: "签证材料", stage: "申请准备", next_action: "按日本签证照片规格准备。" },
+      { name: "赴日行程表", category: "签证材料", stage: "提交申请", next_action: "准备每日行程、酒店和交通计划。" },
+      { name: "财力证明", category: "签证材料", stage: "提交申请", next_action: "按代办机构和领区要求准备流水、收入或存款证明。" },
+      { name: "在职 / 在读证明", category: "签证材料", stage: "提交申请", requirement_level: "视情况需要", next_action: "按个人身份准备在职证明或在读证明。" }
+    ]
+  },
+  {
+    title: "日本商务 / 访友签",
+    description: "适合商务访问、探亲访友等短期赴日。",
+    meta: "邀请 · 身元保证 · 关系",
+    materials: [
+      { name: "日本签证申请表", category: "签证材料", stage: "申请准备", next_action: "按日本使领馆或代办机构要求填写。", source_name: "Japan MOFA visa information", source_url: "https://www.mofa.go.jp/j_info/visit/visa/index.html" },
+      { name: "邀请理由书", category: "签证材料", stage: "提交申请", next_action: "由日本邀请方准备，说明邀请目的和行程。" },
+      { name: "身元保证书", category: "签证材料", stage: "提交申请", requirement_level: "视情况需要", next_action: "按签证类型和邀请方情况确认是否需要。" },
+      { name: "滞在预定表", category: "签证材料", stage: "提交申请", next_action: "列出在日本期间的访问安排。" },
+      { name: "关系证明 / 商务证明", category: "签证材料", stage: "提交申请", next_action: "访友准备关系说明；商务准备双方公司关系或业务材料。" }
+    ]
+  },
+  {
+    title: "美国 B1/B2 签证",
+    description: "适合旅游、探亲、短期商务等非移民访问。",
+    meta: "DS-160 · 预约 · 面签",
+    materials: [
+      { name: "DS-160 确认页", category: "签证材料", stage: "申请准备", next_action: "在线填写 DS-160 后保存确认页。", source_name: "U.S. Department of State DS-160", source_url: "https://travel.state.gov/content/travel/en/us-visas/visa-information-resources/forms/ds-160-online-nonimmigrant-visa-application.html" },
+      { name: "签证预约确认页", category: "签证材料", stage: "提交申请", next_action: "完成缴费和预约后保存确认页。" },
+      { name: "护照", category: "签证材料", stage: "申请准备", next_action: "检查有效期和旧签证记录。" },
+      { name: "照片", category: "签证材料", stage: "申请准备", next_action: "按美国签证照片规格准备电子版或纸质版。" },
+      { name: "行程计划", category: "签证材料", stage: "提交申请", requirement_level: "可选", next_action: "准备旅行目的、城市、日期和预算说明。" },
+      { name: "在职 / 在读 / 资金辅助材料", category: "签证材料", stage: "提交申请", requirement_level: "视情况需要", next_action: "按个人身份准备能说明约束力和支付能力的材料。" }
+    ]
+  },
+  {
+    title: "美国 F-1 学生签证",
+    description: "适合去美国读书的学生签证准备。",
+    meta: "I-20 · SEVIS · DS-160",
+    materials: [
+      { name: "I-20", category: "签证材料", stage: "CAS 与签证", next_action: "由美国学校签发，检查姓名、项目和费用信息。", source_name: "Study in the States", source_url: "https://studyinthestates.dhs.gov/students/prepare/students-and-the-form-i-20" },
+      { name: "SEVIS I-901 付款证明", category: "付款材料", stage: "CAS 与签证", next_action: "面签前支付 SEVIS fee 并保存确认页。" },
+      { name: "DS-160 确认页", category: "签证材料", stage: "CAS 与签证", next_action: "填写 DS-160 并保存确认页。", source_name: "U.S. Department of State DS-160", source_url: "https://travel.state.gov/content/travel/en/us-visas/visa-information-resources/forms/ds-160-online-nonimmigrant-visa-application.html" },
+      { name: "签证预约确认页", category: "签证材料", stage: "CAS 与签证", next_action: "完成预约后保存确认页。" },
+      { name: "录取信", category: "申请材料", stage: "CAS 与签证", next_action: "准备学校 offer 或 admission letter。" },
+      { name: "资金证明", category: "签证材料", stage: "CAS 与签证", next_action: "准备覆盖学费和生活费的资金说明。" }
+    ]
   }
 ];
 
@@ -301,6 +391,21 @@ export default function HomePage() {
     await loadUserData(session);
   }
 
+  async function quickConfirm(material: Material) {
+    if (!session) return;
+    setMessage(`正在确认「${material.name}」...`);
+    try {
+      await apiRequest<Material[]>(`materials?id=eq.${material.id}`, session.access_token, {
+        method: "PATCH",
+        body: JSON.stringify({ status: "已确认" })
+      });
+      await loadUserData(session);
+      setMessage(`已确认「${material.name}」。`);
+    } catch (error) {
+      setMessage(error instanceof Error ? `确认失败：${error.message}` : "确认失败，请稍后再试。");
+    }
+  }
+
   function startEdit(material: Material) {
     setEditingId(material.id);
     setForm({
@@ -470,14 +575,15 @@ export default function HomePage() {
         <code>{shareUrlLabel}</code>
       </section>
 
-      <section className="card panel">
-        <div className="section-heading">
+      <details className="card panel section-details" open>
+        <summary className="section-summary">
           <div>
             <p className="eyebrow">Templates</p>
             <h2 className="section-title">选择模板</h2>
           </div>
-          <p>按申请阶段一键添加材料，已经存在的材料会自动跳过。</p>
-        </div>
+          <span>收起 / 展开</span>
+        </summary>
+        <p className="section-note">按申请阶段一键添加材料，已经存在的材料会自动跳过。签证材料请以官方入口和对应领区要求为准。</p>
         <div className="template-grid">
           {templateCards.map((template) => (
             <button
@@ -495,7 +601,7 @@ export default function HomePage() {
           ))}
         </div>
         {message && <p className="feedback">{message}</p>}
-      </section>
+      </details>
 
       <details className="card panel add-panel" open={Boolean(editingId)}>
         <summary>
@@ -519,8 +625,14 @@ export default function HomePage() {
         </form>
       </details>
 
-      <section className="card panel">
-        <h2 className="section-title mb-5">我的清单</h2>
+      <details className="card panel section-details" open>
+        <summary className="section-summary">
+          <div>
+            <p className="eyebrow">Timeline</p>
+            <h2 className="section-title">我的清单</h2>
+          </div>
+          <span>收起 / 展开</span>
+        </summary>
         {!materials.length && (
           <div className="empty-state">
             <strong>还没有材料</strong>
@@ -555,6 +667,7 @@ export default function HomePage() {
                       <p className="next-action"><strong>下一步</strong><br />{item.next_action || item.how_to_get || "暂未设置下一步"}</p>
                       <div className="flex flex-wrap gap-2">
                         {item.source_url && <a className="button button-soft" href={item.source_url} target="_blank" rel="noopener noreferrer">官方入口</a>}
+                        {item.status !== "已确认" && <button className="button button-primary" type="button" onClick={() => quickConfirm(item)}>一键确认</button>}
                         <button className="button button-soft" type="button" onClick={() => startEdit(item)}>编辑</button>
                         <button className="button button-danger" type="button" onClick={() => deleteMaterial(item.id)}>删除</button>
                       </div>
@@ -565,7 +678,7 @@ export default function HomePage() {
             );
           })}
         </div>
-      </section>
+      </details>
     </main>
   );
 }
