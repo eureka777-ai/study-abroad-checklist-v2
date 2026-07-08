@@ -539,11 +539,14 @@ textarea {
   display: block;
   overflow: hidden;
   border-radius: 16px;
-  background: var(--surface-soft);
-  color: var(--muted);
+  border: 1px solid rgba(0, 113, 227, 0.12);
+  background: rgba(0, 113, 227, 0.06);
+  color: var(--primary);
   padding: 12px 14px;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-family: inherit;
+  font-weight: 650;
 }
 
 .section-heading {
@@ -587,6 +590,12 @@ textarea {
   box-shadow: 0 14px 34px rgba(0, 0, 0, 0.07);
 }
 
+.template-card:disabled {
+  cursor: wait;
+  opacity: 0.68;
+  transform: none;
+}
+
 .template-card span {
   color: var(--primary);
   font-size: 13px;
@@ -611,6 +620,59 @@ textarea {
   font-size: 13px;
   font-style: normal;
   font-weight: 650;
+}
+
+.feedback {
+  margin: 16px 0 0;
+  border-radius: 16px;
+  background: rgba(0, 113, 227, 0.08);
+  color: var(--primary);
+  padding: 12px 14px;
+  font-size: 15px;
+  font-weight: 650;
+}
+
+.add-panel {
+  padding: 0;
+  overflow: hidden;
+}
+
+.add-panel summary {
+  display: flex;
+  min-height: 74px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 28px;
+  list-style: none;
+}
+
+.add-panel summary::-webkit-details-marker {
+  display: none;
+}
+
+.add-panel summary span {
+  color: var(--text);
+  font-size: 24px;
+  font-weight: 760;
+}
+
+.add-panel summary small {
+  border-radius: 999px;
+  background: rgba(0, 113, 227, 0.08);
+  color: var(--primary);
+  padding: 9px 14px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.add-panel[open] summary {
+  border-bottom: 1px solid var(--line);
+}
+
+.add-panel form {
+  padding: 24px 28px 28px;
 }
 
 .progress-fill {

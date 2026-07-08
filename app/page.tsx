@@ -168,8 +168,10 @@ export default function HomePage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [busyTemplate, setBusyTemplate] = useState("");
 
   const shareUrl = profile ? `${window.location.origin}/share/${profile.share_slug}` : "";
+  const shareUrlLabel = shareUrl || "正在生成分享链接...";
 
   useEffect(() => {
     const saved = window.localStorage.getItem("study-v2-session");
@@ -235,26 +237,34 @@ export default function HomePage() {
 
   async function addMaterialsFromTemplate(items = seedMaterials, label = "默认材料") {
     if (!session) return;
-    const existing = new Set(materials.map((item) => item.name));
-    const rows = items.filter((item) => !existing.has(item.name)).map((item) => ({
-      user_id: session.user.id,
-      status: "未开始",
-      requirement_level: "必需",
-      deadline: null,
-      note: "",
-      source_name: "",
-      source_url: "",
-      how_to_get: "",
-      applies_to: "",
-      ...item
-    }));
-    if (!rows.length) {
-      setMessage(`${label}已经添加过了。`);
-      return;
+    setBusyTemplate(label);
+    setMessage(`正在添加「${label}」...`);
+    try {
+      const existing = new Set(materials.map((item) => item.name));
+      const rows = items.filter((item) => !existing.has(item.name)).map((item) => ({
+        user_id: session.user.id,
+        status: "未开始",
+        requirement_level: "必需",
+        deadline: null,
+        note: "",
+        source_name: "",
+        source_url: "",
+        how_to_get: "",
+        applies_to: "",
+        ...item
+      }));
+      if (!rows.length) {
+        setMessage(`${label}已经添加过了。`);
+        return;
+      }
+      await apiRequest<Material[]>("materials", session.access_token, { method: "POST", body: JSON.stringify(rows) });
+      await loadUserData(session);
+      setMessage(`已从「${label}」添加 ${rows.length} 项材料。`);
+    } catch (error) {
+      setMessage(error instanceof Error ? `添加失败：${error.message}` : "添加失败，请稍后再试。");
+    } finally {
+      setBusyTemplate("");
     }
-    await apiRequest<Material[]>("materials", session.access_token, { method: "POST", body: JSON.stringify(rows) });
-    await loadUserData(session);
-    setMessage(`已从「${label}」添加 ${rows.length} 项材料。`);
   }
 
   async function addSeedMaterials() {
@@ -314,6 +324,15 @@ export default function HomePage() {
     setSession(null);
     setProfile(null);
     setMaterials([]);
+  }
+
+  async function copyShareUrl() {
+    if (!shareUrl) {
+      setMessage("分享链接还在生成中，请稍等几秒再试。");
+      return;
+    }
+    await navigator.clipboard.writeText(shareUrl);
+    setMessage("已复制家庭分享链接。");
   }
 
   if (!SUPABASE_URL || !SUPABASE_KEY) {
@@ -418,7 +437,7 @@ export default function HomePage() {
           <p className="subtle">按申请、Offer、签证、住宿和行前阶段推进。你更新进度，家人只读查看。</p>
           <div className="quick-actions">
             <button className="button button-primary" type="button" onClick={addSeedMaterials}>添加默认材料</button>
-            <button className="button button-soft" type="button" onClick={() => navigator.clipboard.writeText(shareUrl)}>复制分享链接</button>
+            <button className="button button-soft" type="button" onClick={copyShareUrl}>复制分享链接</button>
             <button className="button button-plain" type="button" onClick={logout}>退出登录</button>
           </div>
         </div>
@@ -448,7 +467,7 @@ export default function HomePage() {
           <h2>家庭只读分享</h2>
           <p>爸妈可以看到最新进度，但不能编辑你的材料。</p>
         </div>
-        <code>{shareUrl}</code>
+        <code>{shareUrlLabel}</code>
       </section>
 
       <section className="card panel">
@@ -461,23 +480,28 @@ export default function HomePage() {
         </div>
         <div className="template-grid">
           {templateCards.map((template) => (
-            <button className="template-card" type="button" key={template.title} onClick={() => addMaterialsFromTemplate(template.materials, template.title)}>
+            <button
+              className="template-card"
+              type="button"
+              key={template.title}
+              disabled={Boolean(busyTemplate)}
+              onClick={() => addMaterialsFromTemplate(template.materials, template.title)}
+            >
               <span>{template.meta}</span>
               <strong>{template.title}</strong>
               <p>{template.description}</p>
-              <em>{template.materials.length} 项材料</em>
+              <em>{busyTemplate === template.title ? "添加中..." : `${template.materials.length} 项材料`}</em>
             </button>
           ))}
         </div>
+        {message && <p className="feedback">{message}</p>}
       </section>
 
-      <section className="card panel">
-        <div className="flex flex-wrap gap-3 items-center justify-between mb-4">
-          <h2 className="section-title">{editingId ? "编辑材料" : "添加材料"}</h2>
-          <div className="flex gap-2">
-            <button className="button button-soft" type="button" onClick={addSeedMaterials}>添加默认材料</button>
-          </div>
-        </div>
+      <details className="card panel add-panel" open={Boolean(editingId)}>
+        <summary>
+          <span>{editingId ? "编辑材料" : "手动添加材料"}</span>
+          <small>展开表单</small>
+        </summary>
         <form className="grid-form" onSubmit={saveMaterial}>
           <label className="label">材料名称<input className="input" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required /></label>
           <Select label="分类" value={form.category} options={categories} onChange={(value) => setForm({ ...form, category: value })} />
@@ -493,8 +517,7 @@ export default function HomePage() {
           <button className="button button-primary" type="submit">{editingId ? "保存修改" : "添加材料"}</button>
           {editingId && <button className="button button-soft" type="button" onClick={() => { setEditingId(null); setForm(defaultForm); }}>取消编辑</button>}
         </form>
-        {message && <p className="subtle mt-4">{message}</p>}
-      </section>
+      </details>
 
       <section className="card panel">
         <h2 className="section-title mb-5">我的清单</h2>
