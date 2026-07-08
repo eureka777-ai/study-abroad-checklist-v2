@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 
 type Session = {
   access_token: string;
@@ -33,6 +34,7 @@ type Material = {
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+const FEEDBACK_URL = "https://example.com/feedback";
 
 const statuses = ["未开始", "准备中", "已完成", "已上传", "已确认", "不适用"];
 const categories = ["申请材料", "学术材料", "语言材料", "签证材料", "住宿材料", "付款材料", "其他"];
@@ -54,6 +56,8 @@ const defaultForm = {
   next_action: "",
   applies_to: ""
 };
+
+type FormErrors = Partial<Record<keyof typeof defaultForm, string>>;
 
 const seedMaterials = [
   { name: "护照", category: "签证材料", stage: "申请准备", next_action: "确认有效期，如不足则先换发护照。", applies_to: "留学、签证和出入境几乎都需要。" },
@@ -558,6 +562,25 @@ async function updatePasswordRequest(token: string, password: string) {
   return data;
 }
 
+async function refreshSessionRequest(refreshToken: string) {
+  const data = await authRequest("token?grant_type=refresh_token", { refresh_token: refreshToken });
+  return data as Session;
+}
+
+function isExpiredTokenError(error: unknown) {
+  return error instanceof Error && error.message.toLowerCase().includes("jwt expired");
+}
+
+function isValidUrl(value: string) {
+  if (!value.trim()) return true;
+  try {
+    new URL(value);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 async function apiRequest<T>(path: string, token: string, options: RequestInit = {}): Promise<T> {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
     ...options,
@@ -580,7 +603,9 @@ export default function HomePage() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [materials, setMaterials] = useState<Material[]>([]);
   const [form, setForm] = useState(defaultForm);
+  const [formErrors, setFormErrors] = useState<FormErrors>({});
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [addModalOpen, setAddModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<"login" | "signup" | "forgot">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -648,6 +673,35 @@ export default function HomePage() {
       || null;
   }, [materials]);
 
+  function validateMaterialForm() {
+    const errors: FormErrors = {};
+    if (!form.name.trim()) errors.name = "请输入材料名称";
+    if (!isValidUrl(form.source_url)) errors.source_url = "请输入有效网址";
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  }
+
+  function openAddMaterialModal() {
+    setEditingId(null);
+    setForm(defaultForm);
+    setFormErrors({});
+    setAddModalOpen(true);
+  }
+
+  function closeMaterialModal() {
+    setEditingId(null);
+    setAddModalOpen(false);
+    setForm(defaultForm);
+    setFormErrors({});
+  }
+
+  function updateFormField<Key extends keyof typeof defaultForm>(key: Key, value: (typeof defaultForm)[Key]) {
+    setForm((current) => ({ ...current, [key]: value }));
+    if (formErrors[key]) {
+      setFormErrors((current) => ({ ...current, [key]: undefined }));
+    }
+  }
+
   async function handleAuth(event: FormEvent) {
     event.preventDefault();
     setMessage("");
@@ -689,30 +743,76 @@ export default function HomePage() {
     }
   }
 
-  async function loadUserData(currentSession: Session) {
-    const token = currentSession.access_token;
-    const profiles = await apiRequest<Profile[]>(`profiles?id=eq.${currentSession.user.id}&select=*`, token);
-    let currentProfile = profiles[0];
-    if (!currentProfile) {
-      const [created] = await apiRequest<Profile[]>("profiles", token, {
-        method: "POST",
-        body: JSON.stringify({
-          id: currentSession.user.id,
-          display_name: currentSession.user.email?.split("@")[0] || "我",
-          share_slug: `${slugify(currentSession.user.email || "user")}-${currentSession.user.id.slice(0, 6)}`
-        })
-      });
-      currentProfile = created;
+  async function refreshSession(currentSession: Session) {
+    if (!currentSession.refresh_token) throw new Error("登录已过期，请重新登录。");
+    const data = await refreshSessionRequest(currentSession.refresh_token);
+    const nextSession: Session = {
+      access_token: data.access_token,
+      refresh_token: data.refresh_token || currentSession.refresh_token,
+      user: data.user || currentSession.user
+    };
+    window.localStorage.setItem("study-v2-session", JSON.stringify(nextSession));
+    setSession(nextSession);
+    return nextSession;
+  }
+
+  async function requestWithSession<T>(path: string, options: RequestInit = {}) {
+    if (!session) throw new Error("请先登录。");
+    try {
+      return await apiRequest<T>(path, session.access_token, options);
+    } catch (error) {
+      if (!isExpiredTokenError(error)) throw error;
+      const nextSession = await refreshSession(session);
+      return apiRequest<T>(path, nextSession.access_token, options);
     }
-    setProfile(currentProfile);
-    const rows = await apiRequest<Material[]>(`materials?user_id=eq.${currentSession.user.id}&select=*&order=created_at.asc`, token);
-    setMaterials(rows);
+  }
+
+  function getStoredSession() {
+    const saved = window.localStorage.getItem("study-v2-session");
+    return saved ? JSON.parse(saved) as Session : null;
+  }
+
+  async function loadUserData(currentSession: Session) {
+    try {
+      const token = currentSession.access_token;
+      const profiles = await apiRequest<Profile[]>(`profiles?id=eq.${currentSession.user.id}&select=*`, token);
+      let currentProfile = profiles[0];
+      if (!currentProfile) {
+        const [created] = await apiRequest<Profile[]>("profiles", token, {
+          method: "POST",
+          body: JSON.stringify({
+            id: currentSession.user.id,
+            display_name: currentSession.user.email?.split("@")[0] || "我",
+            share_slug: `${slugify(currentSession.user.email || "user")}-${currentSession.user.id.slice(0, 6)}`
+          })
+        });
+        currentProfile = created;
+      }
+      setProfile(currentProfile);
+      const rows = await apiRequest<Material[]>(`materials?user_id=eq.${currentSession.user.id}&select=*&order=created_at.asc`, token);
+      setMaterials(rows);
+    } catch (error) {
+      if (!isExpiredTokenError(error)) {
+        setMessage(error instanceof Error ? error.message : "加载失败，请重新登录。");
+        toast.error(error instanceof Error ? error.message : "加载失败，请重新登录");
+        return;
+      }
+      try {
+        const nextSession = await refreshSession(currentSession);
+        await loadUserData(nextSession);
+      } catch {
+        logout();
+        setMessage("登录已过期，请重新登录。");
+        toast.error("登录状态过期了，请重新登录");
+      }
+    }
   }
 
   async function addMaterialsFromTemplate(items = seedMaterials, label = "默认材料") {
     if (!session) return;
     setBusyTemplate(label);
     setMessage(`正在添加「${label}」...`);
+    const toastId = toast.loading(`正在添加「${label}」...`);
     try {
       const existing = new Set(materials.map((item) => item.name));
       const rows = items.filter((item) => !existing.has(item.name)).map((item) => ({
@@ -729,13 +829,16 @@ export default function HomePage() {
       }));
       if (!rows.length) {
         setMessage(`${label}已经添加过了。`);
+        toast.info("这些材料已经在你的清单里了", { id: toastId });
         return;
       }
-      await apiRequest<Material[]>("materials", session.access_token, { method: "POST", body: JSON.stringify(rows) });
-      await loadUserData(session);
+      await requestWithSession<Material[]>("materials", { method: "POST", body: JSON.stringify(rows) });
+      await loadUserData(getStoredSession() || session);
       setMessage(`已从「${label}」添加 ${rows.length} 项材料。`);
+      toast.success(`已添加 ${rows.length} 项材料`, { id: toastId });
     } catch (error) {
       setMessage(error instanceof Error ? `添加失败：${error.message}` : "添加失败，请稍后再试。");
+      toast.error(error instanceof Error ? `添加失败：${error.message}` : "添加失败，请稍后再试", { id: toastId });
     } finally {
       setBusyTemplate("");
     }
@@ -749,6 +852,7 @@ export default function HomePage() {
     const shouldOpen = previewTemplate?.title !== template.title;
     setPreviewTemplate(shouldOpen ? template : null);
     setMessage(shouldOpen ? `正在预览「${template.title}」。` : `已收起「${template.title}」预览。`);
+    toast.message(shouldOpen ? `正在预览「${template.title}」` : `已收起「${template.title}」预览`);
     if (shouldOpen) {
       window.setTimeout(() => {
         document.getElementById("template-preview")?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -759,33 +863,54 @@ export default function HomePage() {
   async function saveMaterial(event: FormEvent) {
     event.preventDefault();
     if (!session) return;
+    if (!validateMaterialForm()) {
+      toast.error("请先检查表单内容");
+      return;
+    }
+    const isEditing = Boolean(editingId);
     const payload = {
       user_id: session.user.id,
       ...form,
       deadline: form.deadline || null
     };
-    if (editingId) {
-      await apiRequest<Material[]>(`materials?id=eq.${editingId}`, session.access_token, {
-        method: "PATCH",
-        body: JSON.stringify(payload)
-      });
-    } else {
-      await apiRequest<Material[]>("materials", session.access_token, {
-        method: "POST",
-        body: JSON.stringify(payload)
-      });
+    try {
+      if (editingId) {
+        await requestWithSession<Material[]>(`materials?id=eq.${editingId}`, {
+          method: "PATCH",
+          body: JSON.stringify(payload)
+        });
+      } else {
+        await requestWithSession<Material[]>("materials", {
+          method: "POST",
+          body: JSON.stringify(payload)
+        });
+      }
+      setForm(defaultForm);
+      setFormErrors({});
+      setEditingId(null);
+      setAddModalOpen(false);
+      await loadUserData(getStoredSession() || session);
+      setMessage(isEditing ? "材料已保存。" : "材料已添加。");
+      toast.success(isEditing ? "已保存" : "已添加成功");
+    } catch (error) {
+      const text = error instanceof Error ? error.message : "操作失败，请稍后重试";
+      setMessage(text);
+      toast.error(text.toLowerCase().includes("jwt expired") ? "登录状态过期了，请重新登录" : text);
     }
-    setForm(defaultForm);
-    setEditingId(null);
-    await loadUserData(session);
-    setMessage(editingId ? "材料已保存。" : "材料已添加。");
   }
 
   async function deleteMaterial(id: string) {
-    if (!session || !window.confirm("确定删除这项材料吗？")) return;
-    await apiRequest(`materials?id=eq.${id}`, session.access_token, { method: "DELETE" });
-    await loadUserData(session);
-    setMessage("材料已删除。");
+    if (!session || !window.confirm("确定要删除这个材料吗？")) return;
+    try {
+      await requestWithSession(`materials?id=eq.${id}`, { method: "DELETE" });
+      await loadUserData(getStoredSession() || session);
+      setMessage("材料已删除。");
+      toast.success("已删除");
+    } catch (error) {
+      const text = error instanceof Error ? error.message : "删除失败，请稍后再试";
+      setMessage(text);
+      toast.error(text);
+    }
   }
 
   function toggleSelectMaterial(id: string) {
@@ -799,16 +924,19 @@ export default function HomePage() {
   async function updateSelectedStatus(status: string) {
     if (!session || !selectedIds.length) return;
     setMessage(`正在批量更新 ${selectedIds.length} 项材料...`);
+    const toastId = toast.loading(`正在更新 ${selectedIds.length} 项材料...`);
     try {
-      await Promise.all(selectedIds.map((id) => apiRequest<Material[]>(`materials?id=eq.${id}`, session.access_token, {
+      await Promise.all(selectedIds.map((id) => requestWithSession<Material[]>(`materials?id=eq.${id}`, {
         method: "PATCH",
         body: JSON.stringify({ status })
       })));
-      await loadUserData(session);
+      await loadUserData(getStoredSession() || session);
       setBulkStatus(status);
       setMessage(`已将 ${selectedIds.length} 项材料改为「${status}」。`);
+      toast.success("批量状态已更新", { id: toastId });
     } catch (error) {
       setMessage(error instanceof Error ? `批量更新失败：${error.message}` : "批量更新失败，请稍后再试。");
+      toast.error(error instanceof Error ? `批量更新失败：${error.message}` : "批量更新失败，请稍后再试", { id: toastId });
     }
   }
 
@@ -816,34 +944,42 @@ export default function HomePage() {
     if (!session || !selectedIds.length) return;
     if (!window.confirm(`确定删除选中的 ${selectedIds.length} 项材料吗？`)) return;
     setMessage(`正在删除 ${selectedIds.length} 项材料...`);
+    const toastId = toast.loading(`正在删除 ${selectedIds.length} 项材料...`);
     try {
-      await Promise.all(selectedIds.map((id) => apiRequest(`materials?id=eq.${id}`, session.access_token, { method: "DELETE" })));
-      await loadUserData(session);
+      await Promise.all(selectedIds.map((id) => requestWithSession(`materials?id=eq.${id}`, { method: "DELETE" })));
+      await loadUserData(getStoredSession() || session);
       setSelectedIds([]);
       setMessage("已删除选中的材料。");
+      toast.success("已删除所选材料", { id: toastId });
     } catch (error) {
       setMessage(error instanceof Error ? `批量删除失败：${error.message}` : "批量删除失败，请稍后再试。");
+      toast.error(error instanceof Error ? `批量删除失败：${error.message}` : "批量删除失败，请稍后再试", { id: toastId });
     }
   }
 
   async function quickConfirm(material: Material) {
     if (!session) return;
     setMessage(`正在确认「${material.name}」...`);
+    const toastId = toast.loading(`正在确认「${material.name}」...`);
     try {
-      await apiRequest<Material[]>(`materials?id=eq.${material.id}`, session.access_token, {
+      await requestWithSession<Material[]>(`materials?id=eq.${material.id}`, {
         method: "PATCH",
         body: JSON.stringify({ status: "已确认" })
       });
-      await loadUserData(session);
+      await loadUserData(getStoredSession() || session);
       setMessage(`已确认「${material.name}」。`);
+      toast.success("已确认", { id: toastId });
     } catch (error) {
       setMessage(error instanceof Error ? `确认失败：${error.message}` : "确认失败，请稍后再试。");
+      toast.error(error instanceof Error ? `确认失败：${error.message}` : "确认失败，请稍后再试", { id: toastId });
     }
   }
 
   function startEdit(material: Material) {
     setBulkMode(false);
+    setAddModalOpen(false);
     setEditingId(material.id);
+    setFormErrors({});
     setMessage(`正在编辑「${material.name}」。`);
     setForm({
       name: material.name,
@@ -872,10 +1008,55 @@ export default function HomePage() {
   async function copyShareUrl() {
     if (!shareUrl) {
       setMessage("分享链接还在生成中，请稍等几秒再试。");
+      toast.info("分享链接还在生成中，请稍等几秒");
       return;
     }
-    await navigator.clipboard.writeText(shareUrl);
-    setMessage("已复制家庭分享链接。");
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setMessage("已复制家庭分享链接。");
+      toast.success("链接已复制");
+    } catch {
+      toast.error("复制失败，请手动复制链接");
+    }
+  }
+
+  function renderMaterialForm(submitLabel: string) {
+    return (
+      <form className="grid-form" onSubmit={saveMaterial}>
+        <label className="label">
+          材料名称
+          <input
+            className={`input ${formErrors.name ? "input-error" : ""}`}
+            value={form.name}
+            onChange={(e) => updateFormField("name", e.target.value)}
+            aria-invalid={Boolean(formErrors.name)}
+          />
+          {formErrors.name && <span className="field-error">{formErrors.name}</span>}
+        </label>
+        <Select label="分类" value={form.category} options={categories} onChange={(value) => updateFormField("category", value)} />
+        <Select label="阶段" value={form.stage} options={stages} onChange={(value) => updateFormField("stage", value)} />
+        <Select label="状态" value={form.status} options={statuses} onChange={(value) => updateFormField("status", value)} />
+        <Select label="重要程度" value={form.requirement_level} options={levels} onChange={(value) => updateFormField("requirement_level", value)} />
+        <label className="label">截止日期<input className="input" type="date" value={form.deadline} onChange={(e) => updateFormField("deadline", e.target.value)} /></label>
+        <label className="label">来源名称<input className="input" value={form.source_name} onChange={(e) => updateFormField("source_name", e.target.value)} /></label>
+        <label className="label">
+          官方入口
+          <input
+            className={`input ${formErrors.source_url ? "input-error" : ""}`}
+            value={form.source_url}
+            onChange={(e) => updateFormField("source_url", e.target.value)}
+            placeholder="https://..."
+            aria-invalid={Boolean(formErrors.source_url)}
+          />
+          {formErrors.source_url && <span className="field-error">{formErrors.source_url}</span>}
+        </label>
+        <label className="label col-span-full md:col-span-2">下一步动作<textarea className="input" rows={3} value={form.next_action} onChange={(e) => updateFormField("next_action", e.target.value)} /></label>
+        <label className="label col-span-full md:col-span-2">适用情况<textarea className="input" rows={3} value={form.applies_to} onChange={(e) => updateFormField("applies_to", e.target.value)} /></label>
+        <label className="label col-span-full">备注<textarea className="input" rows={3} value={form.note} onChange={(e) => updateFormField("note", e.target.value)} /></label>
+        <button className="button button-primary" type="submit">{submitLabel}</button>
+        <button className="button button-soft" type="button" onClick={closeMaterialModal}>取消</button>
+      </form>
+    );
   }
 
   if (!SUPABASE_URL || !SUPABASE_KEY) {
@@ -885,6 +1066,7 @@ export default function HomePage() {
           <h1 className="text-3xl font-bold">还差环境变量</h1>
           <p className="subtle mt-3">请先创建 .env.local，填入 Supabase URL 和 Publishable key。</p>
         </section>
+        <a className="feedback-button" href={FEEDBACK_URL} target="_blank" rel="noopener noreferrer">反馈</a>
       </main>
     );
   }
@@ -1012,6 +1194,7 @@ export default function HomePage() {
             </article>
           </div>
         </section>
+        <a className="feedback-button" href={FEEDBACK_URL} target="_blank" rel="noopener noreferrer">反馈</a>
       </main>
     );
   }
@@ -1117,8 +1300,14 @@ export default function HomePage() {
         </div>
         {!filteredTemplates.length && (
           <div className="empty-state">
+            <span className="empty-icon">?</span>
             <strong>没有找到匹配模板</strong>
             <p>可以清空筛选，或者换一个国家、身份、签证类型组合。</p>
+            <div className="empty-actions">
+              <button className="button button-soft" type="button" onClick={() => { setCountryFilter("全部"); setAudienceFilter("全部"); setTemplateTypeFilter("全部"); }}>
+                清空筛选
+              </button>
+            </div>
           </div>
         )}
         {previewTemplate && (
@@ -1151,26 +1340,21 @@ export default function HomePage() {
         {message && <p className="feedback">{message}</p>}
       </details>
 
-      {!editingId && <details className="card panel add-panel">
-        <summary>
-          <span>手动添加材料</span>
-          <small>展开表单</small>
-        </summary>
-        <form className="grid-form" onSubmit={saveMaterial}>
-          <label className="label">材料名称<input className="input" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required /></label>
-          <Select label="分类" value={form.category} options={categories} onChange={(value) => setForm({ ...form, category: value })} />
-          <Select label="阶段" value={form.stage} options={stages} onChange={(value) => setForm({ ...form, stage: value })} />
-          <Select label="状态" value={form.status} options={statuses} onChange={(value) => setForm({ ...form, status: value })} />
-          <Select label="重要程度" value={form.requirement_level} options={levels} onChange={(value) => setForm({ ...form, requirement_level: value })} />
-          <label className="label">截止日期<input className="input" type="date" value={form.deadline} onChange={(e) => setForm({ ...form, deadline: e.target.value })} /></label>
-          <label className="label">来源名称<input className="input" value={form.source_name} onChange={(e) => setForm({ ...form, source_name: e.target.value })} /></label>
-          <label className="label">官方入口<input className="input" value={form.source_url} onChange={(e) => setForm({ ...form, source_url: e.target.value })} /></label>
-          <label className="label col-span-full md:col-span-2">下一步动作<textarea className="input" rows={3} value={form.next_action} onChange={(e) => setForm({ ...form, next_action: e.target.value })} /></label>
-          <label className="label col-span-full md:col-span-2">适用情况<textarea className="input" rows={3} value={form.applies_to} onChange={(e) => setForm({ ...form, applies_to: e.target.value })} /></label>
-          <label className="label col-span-full">备注<textarea className="input" rows={3} value={form.note} onChange={(e) => setForm({ ...form, note: e.target.value })} /></label>
-          <button className="button button-primary" type="submit">添加材料</button>
-        </form>
-      </details>}
+      {addModalOpen && (
+        <div className="modal-backdrop" role="dialog" aria-modal="true" aria-label="添加材料">
+          <div className="edit-modal">
+            <div className="edit-modal-head">
+              <div>
+                <p className="eyebrow">New Material</p>
+                <h2>添加材料</h2>
+                <p>把临时想到的材料补进清单，保存后会同步到云端。</p>
+              </div>
+              <button className="button button-soft" type="button" onClick={closeMaterialModal}>关闭</button>
+            </div>
+            {renderMaterialForm("添加材料")}
+          </div>
+        </div>
+      )}
 
       {editingId && (
         <div className="modal-backdrop" role="dialog" aria-modal="true" aria-label="编辑材料">
@@ -1181,23 +1365,9 @@ export default function HomePage() {
                 <h2>编辑材料</h2>
                 <p>修改后点击保存，内容会立刻同步到你的清单。</p>
               </div>
-              <button className="button button-soft" type="button" onClick={() => { setEditingId(null); setForm(defaultForm); setMessage("已取消编辑。"); }}>关闭</button>
+              <button className="button button-soft" type="button" onClick={closeMaterialModal}>关闭</button>
             </div>
-            <form className="grid-form" onSubmit={saveMaterial}>
-              <label className="label">材料名称<input className="input" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required /></label>
-              <Select label="分类" value={form.category} options={categories} onChange={(value) => setForm({ ...form, category: value })} />
-              <Select label="阶段" value={form.stage} options={stages} onChange={(value) => setForm({ ...form, stage: value })} />
-              <Select label="状态" value={form.status} options={statuses} onChange={(value) => setForm({ ...form, status: value })} />
-              <Select label="重要程度" value={form.requirement_level} options={levels} onChange={(value) => setForm({ ...form, requirement_level: value })} />
-              <label className="label">截止日期<input className="input" type="date" value={form.deadline} onChange={(e) => setForm({ ...form, deadline: e.target.value })} /></label>
-              <label className="label">来源名称<input className="input" value={form.source_name} onChange={(e) => setForm({ ...form, source_name: e.target.value })} /></label>
-              <label className="label">官方入口<input className="input" value={form.source_url} onChange={(e) => setForm({ ...form, source_url: e.target.value })} /></label>
-              <label className="label col-span-full md:col-span-2">下一步动作<textarea className="input" rows={3} value={form.next_action} onChange={(e) => setForm({ ...form, next_action: e.target.value })} /></label>
-              <label className="label col-span-full md:col-span-2">适用情况<textarea className="input" rows={3} value={form.applies_to} onChange={(e) => setForm({ ...form, applies_to: e.target.value })} /></label>
-              <label className="label col-span-full">备注<textarea className="input" rows={3} value={form.note} onChange={(e) => setForm({ ...form, note: e.target.value })} /></label>
-              <button className="button button-primary" type="submit">保存修改</button>
-              <button className="button button-soft" type="button" onClick={() => { setEditingId(null); setForm(defaultForm); setMessage("已取消编辑。"); }}>取消</button>
-            </form>
+            {renderMaterialForm("保存修改")}
           </div>
         </div>
       )}
@@ -1208,7 +1378,19 @@ export default function HomePage() {
             <p className="eyebrow">Timeline</p>
             <h2 className="section-title">我的清单</h2>
           </div>
-          <span>收起 / 展开</span>
+          <div className="section-summary-actions">
+            <button
+              className="button add-material-button"
+              type="button"
+              onClick={(event) => {
+                event.preventDefault();
+                openAddMaterialModal();
+              }}
+            >
+              ＋ 添加材料
+            </button>
+            <span>收起 / 展开</span>
+          </div>
         </summary>
         <div className="bulk-toolbar">
           <div>
@@ -1232,8 +1414,14 @@ export default function HomePage() {
         </div>
         {!materials.length && (
           <div className="empty-state">
-            <strong>还没有材料</strong>
-            <p>点击上方“添加默认材料”，先生成一份英国留学常用清单。</p>
+            <span className="empty-icon">+</span>
+            <strong>还没有材料清单</strong>
+            <p>选择一个模板，系统会帮你生成第一版；也可以手动添加第一项材料。</p>
+            <div className="empty-actions">
+              <button className="button button-primary" type="button" onClick={openAddMaterialModal}>添加第一项材料</button>
+              <button className="button button-soft" type="button" onClick={() => document.querySelector(".template-grid")?.scrollIntoView({ behavior: "smooth", block: "start" })}>从模板添加</button>
+              <a className="button button-plain" href="/demo">查看示例清单</a>
+            </div>
           </div>
         )}
         <div className="timeline">
@@ -1282,7 +1470,7 @@ export default function HomePage() {
           })}
         </div>
       </details>
-      {message && <div className="toast-feedback" role="status">{message}</div>}
+      <a className="feedback-button" href={FEEDBACK_URL} target="_blank" rel="noopener noreferrer">反馈</a>
     </main>
   );
 }
