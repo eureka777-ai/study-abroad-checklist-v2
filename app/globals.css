@@ -648,6 +648,12 @@ textarea {
   box-shadow: 0 10px 26px rgba(0, 0, 0, 0.06);
 }
 
+.template-card-active {
+  border-color: rgba(0, 113, 227, 0.38);
+  background: rgba(0, 113, 227, 0.045);
+  box-shadow: 0 10px 26px rgba(0, 113, 227, 0.09);
+}
+
 .template-card:disabled {
   cursor: wait;
   opacity: 0.68;
@@ -688,6 +694,74 @@ textarea {
   padding: 12px 14px;
   font-size: 15px;
   font-weight: 650;
+}
+
+.template-preview {
+  margin: 0 24px 24px;
+  border: 1px solid rgba(0, 113, 227, 0.16);
+  border-radius: 20px;
+  background: rgba(0, 113, 227, 0.035);
+  padding: 20px;
+}
+
+.template-preview-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.template-preview-head h3 {
+  margin: 0;
+  color: var(--text);
+  font-size: 24px;
+  letter-spacing: 0;
+}
+
+.preview-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.preview-material-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.preview-material {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.78);
+  padding: 14px;
+}
+
+.preview-material strong {
+  color: var(--text);
+  font-size: 16px;
+}
+
+.preview-material p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.preview-material span {
+  flex: 0 0 auto;
+  height: fit-content;
+  border-radius: 999px;
+  background: var(--surface-soft);
+  color: var(--muted);
+  padding: 6px 9px;
+  font-size: 12px;
+  font-weight: 700;
 }
 
 .add-panel {
@@ -781,7 +855,8 @@ textarea {
   .grid-form,
   .timeline-group,
   .material-grid,
-  .template-grid {
+  .template-grid,
+  .preview-material-grid {
     grid-template-columns: 1fr;
   }
 
@@ -835,5 +910,9 @@ textarea {
 
   .mini-progress {
     width: 100%;
+  }
+
+  .template-preview-head {
+    display: grid;
   }
 }

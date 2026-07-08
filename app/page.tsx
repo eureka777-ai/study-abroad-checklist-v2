@@ -259,6 +259,7 @@ export default function HomePage() {
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [busyTemplate, setBusyTemplate] = useState("");
+  const [previewTemplate, setPreviewTemplate] = useState<(typeof templateCards)[number] | null>(null);
 
   const shareUrl = profile ? `${window.location.origin}/share/${profile.share_slug}` : "";
   const shareUrlLabel = shareUrl || "正在生成分享链接...";
@@ -359,6 +360,11 @@ export default function HomePage() {
 
   async function addSeedMaterials() {
     await addMaterialsFromTemplate(seedMaterials, "默认材料");
+  }
+
+  function toggleTemplatePreview(template: (typeof templateCards)[number]) {
+    setMessage("");
+    setPreviewTemplate((current) => current?.title === template.title ? null : template);
   }
 
   async function saveMaterial(event: FormEvent) {
@@ -583,23 +589,50 @@ export default function HomePage() {
           </div>
           <span>收起 / 展开</span>
         </summary>
-        <p className="section-note">按申请阶段一键添加材料，已经存在的材料会自动跳过。签证材料请以官方入口和对应领区要求为准。</p>
+        <p className="section-note">点一下模板先预览材料；再点同一个模板可收起预览。确认需要后，再添加到正式清单。</p>
         <div className="template-grid">
           {templateCards.map((template) => (
             <button
-              className="template-card"
+              className={`template-card ${previewTemplate?.title === template.title ? "template-card-active" : ""}`}
               type="button"
               key={template.title}
               disabled={Boolean(busyTemplate)}
-              onClick={() => addMaterialsFromTemplate(template.materials, template.title)}
+              onClick={() => toggleTemplatePreview(template)}
             >
               <span>{template.meta}</span>
               <strong>{template.title}</strong>
               <p>{template.description}</p>
-              <em>{busyTemplate === template.title ? "添加中..." : `${template.materials.length} 项材料`}</em>
+              <em>{previewTemplate?.title === template.title ? "正在预览" : `${template.materials.length} 项材料`}</em>
             </button>
           ))}
         </div>
+        {previewTemplate && (
+          <div className="template-preview">
+            <div className="template-preview-head">
+              <div>
+                <p className="eyebrow">Preview</p>
+                <h3>{previewTemplate.title}材料预览</h3>
+              </div>
+              <div className="preview-actions">
+                <button className="button button-primary" type="button" onClick={() => addMaterialsFromTemplate(previewTemplate.materials, previewTemplate.title)} disabled={Boolean(busyTemplate)}>
+                  {busyTemplate === previewTemplate.title ? "添加中..." : "添加到我的清单"}
+                </button>
+                <button className="button button-soft" type="button" onClick={() => setPreviewTemplate(null)}>收起预览</button>
+              </div>
+            </div>
+            <div className="preview-material-grid">
+              {previewTemplate.materials.map((item) => (
+                <article className="preview-material" key={`${previewTemplate.title}-${item.name}`}>
+                  <div>
+                    <strong>{item.name}</strong>
+                    <p>{item.next_action || item.applies_to || "按官方要求确认材料细节。"}</p>
+                  </div>
+                  <span>{item.stage}</span>
+                </article>
+              ))}
+            </div>
+          </div>
+        )}
         {message && <p className="feedback">{message}</p>}
       </details>
 
