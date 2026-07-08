@@ -543,6 +543,21 @@ async function authRequest(path: string, body: unknown) {
   return data;
 }
 
+async function updatePasswordRequest(token: string, password: string) {
+  const res = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+    method: "PUT",
+    headers: {
+      apikey: SUPABASE_KEY,
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ password })
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.msg || data.error_description || data.message || "修改密码失败");
+  return data;
+}
+
 async function apiRequest<T>(path: string, token: string, options: RequestInit = {}): Promise<T> {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
     ...options,
@@ -566,9 +581,11 @@ export default function HomePage() {
   const [materials, setMaterials] = useState<Material[]>([]);
   const [form, setForm] = useState(defaultForm);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [authMode, setAuthMode] = useState<"login" | "signup">("login");
+  const [authMode, setAuthMode] = useState<"login" | "signup" | "forgot">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [resetPassword, setResetPassword] = useState("");
+  const [recoveryToken, setRecoveryToken] = useState("");
   const [message, setMessage] = useState("");
   const [busyTemplate, setBusyTemplate] = useState("");
   const [previewTemplate, setPreviewTemplate] = useState<(typeof templateCards)[number] | null>(null);
@@ -583,6 +600,15 @@ export default function HomePage() {
   const shareUrlLabel = shareUrl || "正在生成分享链接...";
 
   useEffect(() => {
+    const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+    const token = hash.get("access_token");
+    const type = hash.get("type");
+    if (token && type === "recovery") {
+      setRecoveryToken(token);
+      setMessage("请设置一个新密码。");
+      window.history.replaceState(null, "", window.location.pathname);
+      return;
+    }
     const saved = window.localStorage.getItem("study-v2-session");
     if (saved) setSession(JSON.parse(saved));
   }, []);
@@ -620,6 +646,12 @@ export default function HomePage() {
     event.preventDefault();
     setMessage("");
     try {
+      if (authMode === "forgot") {
+        const redirectTo = `${window.location.origin}${window.location.pathname}`;
+        await authRequest(`recover?redirect_to=${encodeURIComponent(redirectTo)}`, { email });
+        setMessage("如果这个邮箱已注册，我们会发送一封重置密码邮件。请去邮箱里点链接。");
+        return;
+      }
       const data = await authRequest(authMode === "login" ? "token?grant_type=password" : "signup", { email, password });
       if (!data.access_token) {
         setMessage("账号已创建。请检查邮箱确认邮件，然后回来登录。");
@@ -630,6 +662,24 @@ export default function HomePage() {
       setSession(nextSession);
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "登录失败");
+    }
+  }
+
+  async function handlePasswordReset(event: FormEvent) {
+    event.preventDefault();
+    setMessage("");
+    if (resetPassword.length < 6) {
+      setMessage("新密码至少 6 位。");
+      return;
+    }
+    try {
+      await updatePasswordRequest(recoveryToken, resetPassword);
+      setRecoveryToken("");
+      setResetPassword("");
+      setAuthMode("login");
+      setMessage("密码已更新，请用新密码登录。");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "修改密码失败");
     }
   }
 
@@ -838,16 +888,41 @@ export default function HomePage() {
               <span>云端同步清单</span>
             </div>
           </div>
-          <form className="card panel auth-box" onSubmit={handleAuth}>
-            <h2 className="text-2xl font-bold">{authMode === "login" ? "登录" : "注册"}</h2>
-            <input className="input" type="email" placeholder="邮箱" value={email} onChange={(e) => setEmail(e.target.value)} required />
-            <input className="input" type="password" placeholder="密码，至少 6 位" value={password} onChange={(e) => setPassword(e.target.value)} required />
-            <button className="button button-primary" type="submit">{authMode === "login" ? "登录" : "创建账号"}</button>
-            <button className="button button-soft" type="button" onClick={() => setAuthMode(authMode === "login" ? "signup" : "login")}>
-              {authMode === "login" ? "没有账号？去注册" : "已有账号？去登录"}
-            </button>
-            {message && <p className="subtle">{message}</p>}
-          </form>
+          {recoveryToken ? (
+            <form className="card panel auth-box" onSubmit={handlePasswordReset}>
+              <h2 className="text-2xl font-bold">设置新密码</h2>
+              <p className="auth-hint">输入一个新的登录密码，之后就可以用新密码进入你的清单。</p>
+              <input className="input" type="password" placeholder="新密码，至少 6 位" value={resetPassword} onChange={(e) => setResetPassword(e.target.value)} required />
+              <button className="button button-primary" type="submit">更新密码</button>
+              <button className="button button-soft" type="button" onClick={() => { setRecoveryToken(""); setResetPassword(""); setAuthMode("login"); }}>
+                返回登录
+              </button>
+              {message && <p className="subtle">{message}</p>}
+            </form>
+          ) : (
+            <form className="card panel auth-box" onSubmit={handleAuth}>
+              <h2 className="text-2xl font-bold">{authMode === "login" ? "登录" : authMode === "signup" ? "注册" : "找回密码"}</h2>
+              <p className="auth-hint">
+                {authMode === "forgot" ? "输入注册邮箱，我们会发送一封重置密码邮件。" : "每个用户登录后都有自己的云端清单。"}
+              </p>
+              <input className="input" type="email" placeholder="邮箱" value={email} onChange={(e) => setEmail(e.target.value)} required />
+              {authMode !== "forgot" && (
+                <input className="input" type="password" placeholder="密码，至少 6 位" value={password} onChange={(e) => setPassword(e.target.value)} required />
+              )}
+              <button className="button button-primary" type="submit">{authMode === "login" ? "登录" : authMode === "signup" ? "创建账号" : "发送重置邮件"}</button>
+              <div className="auth-switches">
+                <button className="button button-soft" type="button" onClick={() => setAuthMode(authMode === "signup" ? "login" : "signup")}>
+                  {authMode === "signup" ? "已有账号？去登录" : "没有账号？去注册"}
+                </button>
+                {authMode !== "forgot" ? (
+                  <button className="button button-plain" type="button" onClick={() => setAuthMode("forgot")}>忘记密码？</button>
+                ) : (
+                  <button className="button button-plain" type="button" onClick={() => setAuthMode("login")}>返回登录</button>
+                )}
+              </div>
+              {message && <p className="subtle">{message}</p>}
+            </form>
+          )}
         </section>
 
         <section className="landing-showcase">

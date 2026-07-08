@@ -283,6 +283,18 @@ textarea {
   max-width: 460px;
 }
 
+.auth-hint {
+  margin: -4px 0 2px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.auth-switches {
+  display: grid;
+  gap: 8px;
+}
+
 .hero-landing {
   min-height: 430px;
   align-items: center;
