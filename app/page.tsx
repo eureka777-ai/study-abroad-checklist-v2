@@ -642,6 +642,12 @@ export default function HomePage() {
     });
   }, [countryFilter, audienceFilter, templateTypeFilter]);
 
+  const nextMaterial = useMemo(() => {
+    return materials.find((item) => item.requirement_level === "必需" && item.status !== "不适用" && !readyStatuses.includes(item.status))
+      || materials.find((item) => item.status !== "不适用" && !readyStatuses.includes(item.status))
+      || null;
+  }, [materials]);
+
   async function handleAuth(event: FormEvent) {
     event.preventDefault();
     setMessage("");
@@ -880,8 +886,12 @@ export default function HomePage() {
         <section className="hero hero-landing">
           <div className="hero-copy">
             <p className="eyebrow">Pathfolio</p>
-            <h1>你的跨国材料路径</h1>
+            <h1>从申请到签证，一页管理所有材料</h1>
             <p className="subtle">从学校申请到学生签证、旅游签、住宿和行前准备，把跨国材料整理成一个清晰的进度页。</p>
+            <div className="hero-actions">
+              <a className="button button-primary" href="#auth">免费开始整理材料</a>
+              <a className="button button-soft" href="/demo">查看示例清单</a>
+            </div>
             <div className="feature-strip" aria-label="核心功能">
               <span>全球模板库</span>
               <span>家人只读分享</span>
@@ -889,7 +899,7 @@ export default function HomePage() {
             </div>
           </div>
           {recoveryToken ? (
-            <form className="card panel auth-box" onSubmit={handlePasswordReset}>
+            <form className="card panel auth-box" id="auth" onSubmit={handlePasswordReset}>
               <h2 className="text-2xl font-bold">设置新密码</h2>
               <p className="auth-hint">输入一个新的登录密码，之后就可以用新密码进入你的清单。</p>
               <input className="input" type="password" placeholder="新密码，至少 6 位" value={resetPassword} onChange={(e) => setResetPassword(e.target.value)} required />
@@ -900,7 +910,7 @@ export default function HomePage() {
               {message && <p className="subtle">{message}</p>}
             </form>
           ) : (
-            <form className="card panel auth-box" onSubmit={handleAuth}>
+            <form className="card panel auth-box" id="auth" onSubmit={handleAuth}>
               <h2 className="text-2xl font-bold">{authMode === "login" ? "登录" : authMode === "signup" ? "注册" : "找回密码"}</h2>
               <p className="auth-hint">
                 {authMode === "forgot" ? "输入注册邮箱，我们会发送一封重置密码邮件。" : "每个用户登录后都有自己的云端清单。"}
@@ -923,6 +933,22 @@ export default function HomePage() {
               {message && <p className="subtle">{message}</p>}
             </form>
           )}
+        </section>
+
+        <section className="parent-story">
+          <div>
+            <p className="eyebrow">Family Share</p>
+            <h2>爸妈总问材料办到哪了？</h2>
+            <p>生成一个只读链接，他们可以随时看进度，但不能修改你的清单。你少解释几遍，他们也更安心。</p>
+          </div>
+          <div className="family-preview-card">
+            <span>妈妈看到的页面</span>
+            <strong>签证材料 7 / 10</strong>
+            <p>最近更新：TB 肺结核检测证明已完成</p>
+            <div className="progress-track">
+              <div className="progress-fill" style={{ width: "70%" }} />
+            </div>
+          </div>
         </section>
 
         <section className="landing-showcase">
@@ -1021,6 +1047,25 @@ export default function HomePage() {
           <p>爸妈可以看到最新进度，但不能编辑你的材料。</p>
         </div>
         <code>{shareUrlLabel}</code>
+      </section>
+
+      <section className="next-step-card">
+        <div>
+          <p className="eyebrow">Next Step</p>
+          <h2>{nextMaterial ? `下一步：${nextMaterial.name}` : materials.length ? "所有材料都处理完了" : "先生成你的第一份清单"}</h2>
+          <p>
+            {nextMaterial
+              ? nextMaterial.next_action || nextMaterial.how_to_get || "打开材料详情，补充下一步动作和官方入口。"
+              : materials.length
+                ? "目前没有未完成材料，可以检查是否有视情况材料需要标记为不适用。"
+                : "从模板库选择国家、身份和签证类型，一键生成适合你的材料清单。"}
+          </p>
+        </div>
+        <div className="next-step-actions">
+          {nextMaterial?.source_url && <a className="button button-soft" href={nextMaterial.source_url} target="_blank" rel="noopener noreferrer">官方入口</a>}
+          {nextMaterial && <button className="button button-primary" type="button" onClick={() => quickConfirm(nextMaterial)}>一键确认</button>}
+          {!materials.length && <button className="button button-primary" type="button" onClick={addSeedMaterials}>添加默认材料</button>}
+        </div>
       </section>
 
       <details className="card panel section-details" open>

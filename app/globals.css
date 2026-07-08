@@ -313,6 +313,12 @@ textarea {
   margin-top: 8px;
 }
 
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
 .feature-strip span {
   border: 1px solid var(--line);
   border-radius: 999px;
@@ -322,6 +328,69 @@ textarea {
   font-size: 14px;
   font-weight: 650;
   box-shadow: 0 8px 26px rgba(0, 0, 0, 0.04);
+}
+
+.parent-story,
+.next-step-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.72fr);
+  gap: 18px;
+  align-items: center;
+  margin-bottom: 18px;
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: var(--shadow);
+  padding: 26px 30px;
+  backdrop-filter: blur(22px);
+}
+
+.parent-story h2,
+.next-step-card h2 {
+  margin: 0;
+  color: var(--text);
+  font-size: clamp(28px, 4vw, 44px);
+  line-height: 1.05;
+  letter-spacing: 0;
+}
+
+.parent-story p,
+.next-step-card p {
+  margin: 10px 0 0;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.family-preview-card {
+  border-radius: 24px;
+  background: var(--surface-soft);
+  padding: 20px;
+}
+
+.family-preview-card span {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.family-preview-card strong {
+  display: block;
+  margin-top: 10px;
+  color: var(--text);
+  font-size: 28px;
+  line-height: 1;
+}
+
+.family-preview-card p {
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.next-step-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
 }
 
 .landing-showcase {
@@ -1000,6 +1069,8 @@ textarea {
 @media (max-width: 860px) {
   .hero,
   .dashboard-hero,
+  .parent-story,
+  .next-step-card,
   .share-bar,
   .section-heading,
   .grid-form,
@@ -1076,6 +1147,10 @@ textarea {
   }
 
   .bulk-actions {
+    justify-content: flex-start;
+  }
+
+  .next-step-actions {
     justify-content: flex-start;
   }
 }
