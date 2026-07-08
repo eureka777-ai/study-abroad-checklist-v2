@@ -40,7 +40,7 @@ async function anonRequest<T>(path: string): Promise<T> {
 
 export default function SharePage() {
   const params = useParams<{ slug: string }>();
-  const slug = params.slug;
+  const slug = params?.slug || "";
   const [profile, setProfile] = useState<Profile | null>(null);
   const [materials, setMaterials] = useState<Material[]>([]);
   const [message, setMessage] = useState("正在加载分享清单...");

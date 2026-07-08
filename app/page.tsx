@@ -69,6 +69,60 @@ const seedMaterials = [
   { name: "机票订单", category: "其他", stage: "行前准备", next_action: "签证获批后再确认航班更稳妥。", requirement_level: "可选" }
 ];
 
+const templateCards = [
+  {
+    title: "英国留学申请",
+    description: "申请学校前后最常用的一组材料。",
+    meta: "学术 · 语言 · Offer",
+    materials: [
+      { name: "护照", category: "签证材料", stage: "申请准备", next_action: "确认有效期，如不足则先换发护照。", applies_to: "留学、签证和出入境几乎都需要。" },
+      { name: "中英文成绩单", category: "学术材料", stage: "申请准备", next_action: "向学校教务处申请中英文版本。" },
+      { name: "毕业证", category: "学术材料", stage: "申请准备", next_action: "向学校申请中文和英文版本，未毕业时可先准备在读证明。" },
+      { name: "学位证", category: "学术材料", stage: "申请准备", next_action: "向学校申请中文和英文版本。" },
+      { name: "雅思 / 语言成绩单", category: "语言材料", stage: "申请准备", next_action: "确认目标院校语言要求并安排考试。" },
+      { name: "个人陈述 PS", category: "申请材料", stage: "提交申请", next_action: "根据目标专业整理经历、动机和职业规划。" },
+      { name: "推荐信", category: "申请材料", stage: "提交申请", next_action: "提前联系老师或上级，确认推荐信提交方式。" },
+      { name: "Conditional Offer", category: "申请材料", stage: "等待 Offer", next_action: "提交申请后等待学校审核。" },
+      { name: "Unconditional Offer", category: "申请材料", stage: "换 Unconditional", next_action: "补齐条件后联系学校换无条件录取。" }
+    ]
+  },
+  {
+    title: "英国学生签证",
+    description: "拿到 Offer 后进入 CAS 和签证阶段。",
+    meta: "CAS · IHS · TB · 资金",
+    materials: [
+      { name: "CAS", category: "签证材料", stage: "CAS 与签证", next_action: "满足学校要求后等待学校发放 CAS。", source_name: "学校 / GOV.UK", source_url: "https://www.gov.uk/student-visa/documents-you-must-provide", applies_to: "英国学生签证需要。" },
+      { name: "签证申请表", category: "签证材料", stage: "CAS 与签证", next_action: "进入官方签证申请入口，确认签证类型后开始填写。", source_name: "GOV.UK Student visa apply", source_url: "https://www.gov.uk/student-visa/apply" },
+      { name: "IHS 付款证明", category: "付款材料", stage: "CAS 与签证", next_action: "提交英国学生签证申请时按系统提示支付 IHS。" },
+      { name: "TB 肺结核检测证明", category: "签证材料", stage: "CAS 与签证", requirement_level: "视情况需要", next_action: "确认是否需要 TB 检测；如需要，预约官方认可诊所。", source_name: "GOV.UK Approved TB clinics", source_url: "https://www.gov.uk/tb-test-visa" },
+      { name: "资金证明", category: "签证材料", stage: "CAS 与签证", requirement_level: "视情况需要", next_action: "确认自己是否需要提交资金证明，并检查存款时间要求。" },
+      { name: "签证预约确认信", category: "签证材料", stage: "CAS 与签证", next_action: "完成线上申请后保存预约确认信息。" }
+    ]
+  },
+  {
+    title: "住宿与付款",
+    description: "确认住哪里、付了什么、什么时候入住。",
+    meta: "住宿 · 押金 · 学费",
+    materials: [
+      { name: "住宿合同", category: "住宿材料", stage: "住宿与付款", next_action: "确认租期、金额、入住日期和付款计划。" },
+      { name: "住宿押金付款证明", category: "付款材料", stage: "住宿与付款", next_action: "保存付款截图、收据或邮件确认。" },
+      { name: "学费付款证明", category: "付款材料", stage: "住宿与付款", next_action: "保存学校系统或银行付款记录。" },
+      { name: "Offer 接受确认", category: "申请材料", stage: "住宿与付款", next_action: "确认是否已接受学校 offer 并保存邮件。" }
+    ]
+  },
+  {
+    title: "行前准备",
+    description: "签证获批后，出发前逐项确认。",
+    meta: "机票 · 保险 · 到校",
+    materials: [
+      { name: "机票订单", category: "其他", stage: "行前准备", next_action: "签证获批后再确认航班更稳妥。", requirement_level: "可选" },
+      { name: "保险信息", category: "其他", stage: "行前准备", next_action: "确认学校、住宿或个人保险安排。" },
+      { name: "接机 / 到校注册信息", category: "其他", stage: "到校注册", next_action: "保存学校注册、接机或报到安排。" },
+      { name: "eVisa / BRP 信息", category: "签证材料", stage: "到校注册", requirement_level: "视情况需要", next_action: "根据签证获批邮件确认线上身份或 BRP 领取方式。" }
+    ]
+  }
+];
+
 function slugify(email: string) {
   return email.split("@")[0].toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || `user-${Date.now()}`;
 }
@@ -179,10 +233,10 @@ export default function HomePage() {
     setMaterials(rows);
   }
 
-  async function addSeedMaterials() {
+  async function addMaterialsFromTemplate(items = seedMaterials, label = "默认材料") {
     if (!session) return;
     const existing = new Set(materials.map((item) => item.name));
-    const rows = seedMaterials.filter((item) => !existing.has(item.name)).map((item) => ({
+    const rows = items.filter((item) => !existing.has(item.name)).map((item) => ({
       user_id: session.user.id,
       status: "未开始",
       requirement_level: "必需",
@@ -195,12 +249,16 @@ export default function HomePage() {
       ...item
     }));
     if (!rows.length) {
-      setMessage("默认材料已经添加过了。");
+      setMessage(`${label}已经添加过了。`);
       return;
     }
     await apiRequest<Material[]>("materials", session.access_token, { method: "POST", body: JSON.stringify(rows) });
     await loadUserData(session);
-    setMessage(`已添加 ${rows.length} 项默认材料。`);
+    setMessage(`已从「${label}」添加 ${rows.length} 项材料。`);
+  }
+
+  async function addSeedMaterials() {
+    await addMaterialsFromTemplate(seedMaterials, "默认材料");
   }
 
   async function saveMaterial(event: FormEvent) {
@@ -352,37 +410,65 @@ export default function HomePage() {
   }
 
   return (
-    <main className="page">
-      <section className="hero">
-          <div>
-            <p className="eyebrow">Study Abroad Planner</p>
-            <h1>我的留学材料</h1>
-          <p className="subtle">按真实申请时间线整理材料。你负责更新进度，家人通过分享链接安心查看。</p>
+    <main className="page dashboard-page">
+      <section className="dashboard-hero">
+        <div className="dashboard-copy">
+          <p className="eyebrow">Study Abroad Planner</p>
+          <h1>我的留学材料</h1>
+          <p className="subtle">按申请、Offer、签证、住宿和行前阶段推进。你更新进度，家人只读查看。</p>
+          <div className="quick-actions">
+            <button className="button button-primary" type="button" onClick={addSeedMaterials}>添加默认材料</button>
+            <button className="button button-soft" type="button" onClick={() => navigator.clipboard.writeText(shareUrl)}>复制分享链接</button>
+            <button className="button button-plain" type="button" onClick={logout}>退出登录</button>
+          </div>
         </div>
-        <div className="card panel">
-          <p className="subtle">必需材料：{stats.readyRequired} / {stats.requiredTotal}</p>
-          <strong className="block text-5xl mt-3">{stats.percent}%</strong>
+
+        <div className="progress-panel">
+          <div className="progress-main">
+            <div>
+              <span>必需材料</span>
+              <strong>{stats.requiredTotal ? `${stats.readyRequired} / ${stats.requiredTotal}` : "等待添加"}</strong>
+            </div>
+            <b>{stats.requiredTotal ? `${stats.percent}%` : "--"}</b>
+          </div>
           <div className="progress-track">
             <div className="progress-fill" style={{ width: `${stats.percent}%` }} />
           </div>
-          <div className="stats mt-5">
-            <span className="stat">已完成<strong>{stats.done}</strong></span>
-            <span className="stat">已上传<strong>{stats.uploaded}</strong></span>
-            <span className="stat">已确认<strong>{stats.confirmed}</strong></span>
+          <div className="stats compact-stats">
+            <span className="stat">完成<strong>{stats.done}</strong></span>
+            <span className="stat">上传<strong>{stats.uploaded}</strong></span>
+            <span className="stat">确认<strong>{stats.confirmed}</strong></span>
             <span className="stat">不适用<strong>{stats.notApplicable}</strong></span>
           </div>
         </div>
       </section>
 
-      <section className="card panel">
-        <div className="flex flex-wrap gap-3 items-center justify-between">
-          <div>
-            <h2 className="section-title">家庭只读分享</h2>
-            <p className="subtle mt-1">把这个链接发给爸妈，他们能看到进度，但不能编辑。</p>
-          </div>
-          <button className="button button-soft" type="button" onClick={() => navigator.clipboard.writeText(shareUrl)}>复制分享链接</button>
+      <section className="share-bar">
+        <div>
+          <h2>家庭只读分享</h2>
+          <p>爸妈可以看到最新进度，但不能编辑你的材料。</p>
         </div>
-        <p className="share-link">{shareUrl}</p>
+        <code>{shareUrl}</code>
+      </section>
+
+      <section className="card panel">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">Templates</p>
+            <h2 className="section-title">选择模板</h2>
+          </div>
+          <p>按申请阶段一键添加材料，已经存在的材料会自动跳过。</p>
+        </div>
+        <div className="template-grid">
+          {templateCards.map((template) => (
+            <button className="template-card" type="button" key={template.title} onClick={() => addMaterialsFromTemplate(template.materials, template.title)}>
+              <span>{template.meta}</span>
+              <strong>{template.title}</strong>
+              <p>{template.description}</p>
+              <em>{template.materials.length} 项材料</em>
+            </button>
+          ))}
+        </div>
       </section>
 
       <section className="card panel">
@@ -390,7 +476,6 @@ export default function HomePage() {
           <h2 className="section-title">{editingId ? "编辑材料" : "添加材料"}</h2>
           <div className="flex gap-2">
             <button className="button button-soft" type="button" onClick={addSeedMaterials}>添加默认材料</button>
-            <button className="button button-soft" type="button" onClick={logout}>退出登录</button>
           </div>
         </div>
         <form className="grid-form" onSubmit={saveMaterial}>
@@ -413,6 +498,12 @@ export default function HomePage() {
 
       <section className="card panel">
         <h2 className="section-title mb-5">我的清单</h2>
+        {!materials.length && (
+          <div className="empty-state">
+            <strong>还没有材料</strong>
+            <p>点击上方“添加默认材料”，先生成一份英国留学常用清单。</p>
+          </div>
+        )}
         <div className="timeline">
           {stages.map((stage) => {
             const rows = materials.filter((item) => (item.stage || "其他") === stage);
