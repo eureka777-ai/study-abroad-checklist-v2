@@ -260,6 +260,9 @@ export default function HomePage() {
   const [message, setMessage] = useState("");
   const [busyTemplate, setBusyTemplate] = useState("");
   const [previewTemplate, setPreviewTemplate] = useState<(typeof templateCards)[number] | null>(null);
+  const [bulkMode, setBulkMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [bulkStatus, setBulkStatus] = useState("已确认");
 
   const shareUrl = profile ? `${window.location.origin}/share/${profile.share_slug}` : "";
   const shareUrlLabel = shareUrl || "正在生成分享链接...";
@@ -397,6 +400,44 @@ export default function HomePage() {
     await loadUserData(session);
   }
 
+  function toggleSelectMaterial(id: string) {
+    setSelectedIds((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]);
+  }
+
+  function toggleSelectAll() {
+    setSelectedIds((current) => current.length === materials.length ? [] : materials.map((item) => item.id));
+  }
+
+  async function updateSelectedStatus(status: string) {
+    if (!session || !selectedIds.length) return;
+    setMessage(`正在批量更新 ${selectedIds.length} 项材料...`);
+    try {
+      await Promise.all(selectedIds.map((id) => apiRequest<Material[]>(`materials?id=eq.${id}`, session.access_token, {
+        method: "PATCH",
+        body: JSON.stringify({ status })
+      })));
+      await loadUserData(session);
+      setBulkStatus(status);
+      setMessage(`已将 ${selectedIds.length} 项材料改为「${status}」。`);
+    } catch (error) {
+      setMessage(error instanceof Error ? `批量更新失败：${error.message}` : "批量更新失败，请稍后再试。");
+    }
+  }
+
+  async function deleteSelectedMaterials() {
+    if (!session || !selectedIds.length) return;
+    if (!window.confirm(`确定删除选中的 ${selectedIds.length} 项材料吗？`)) return;
+    setMessage(`正在删除 ${selectedIds.length} 项材料...`);
+    try {
+      await Promise.all(selectedIds.map((id) => apiRequest(`materials?id=eq.${id}`, session.access_token, { method: "DELETE" })));
+      await loadUserData(session);
+      setSelectedIds([]);
+      setMessage("已删除选中的材料。");
+    } catch (error) {
+      setMessage(error instanceof Error ? `批量删除失败：${error.message}` : "批量删除失败，请稍后再试。");
+    }
+  }
+
   async function quickConfirm(material: Material) {
     if (!session) return;
     setMessage(`正在确认「${material.name}」...`);
@@ -413,6 +454,7 @@ export default function HomePage() {
   }
 
   function startEdit(material: Material) {
+    setBulkMode(false);
     setEditingId(material.id);
     setForm({
       name: material.name,
@@ -435,6 +477,7 @@ export default function HomePage() {
     setSession(null);
     setProfile(null);
     setMaterials([]);
+    setSelectedIds([]);
   }
 
   async function copyShareUrl() {
@@ -666,6 +709,26 @@ export default function HomePage() {
           </div>
           <span>收起 / 展开</span>
         </summary>
+        <div className="bulk-toolbar">
+          <div>
+            <strong>{bulkMode ? `已选择 ${selectedIds.length} 项` : `共 ${materials.length} 项材料`}</strong>
+            <p>{bulkMode ? "勾选材料后可以统一修改状态或删除。" : "开启批量管理后，可以一次处理多项材料。"}</p>
+          </div>
+          <div className="bulk-actions">
+            <button className="button button-soft" type="button" onClick={() => { setBulkMode(!bulkMode); setSelectedIds([]); }}>{bulkMode ? "退出批量" : "批量管理"}</button>
+            {bulkMode && (
+              <>
+                <button className="button button-soft" type="button" onClick={toggleSelectAll}>{selectedIds.length === materials.length ? "取消全选" : "全选"}</button>
+                <select className="bulk-select" value={bulkStatus} onChange={(event) => setBulkStatus(event.target.value)}>
+                  {statuses.map((status) => <option value={status} key={status}>{status}</option>)}
+                </select>
+                <button className="button button-primary" type="button" disabled={!selectedIds.length} onClick={() => updateSelectedStatus(bulkStatus)}>应用状态</button>
+                <button className="button button-soft" type="button" disabled={!selectedIds.length} onClick={() => updateSelectedStatus("已确认")}>一键确认</button>
+                <button className="button button-danger" type="button" disabled={!selectedIds.length} onClick={deleteSelectedMaterials}>删除所选</button>
+              </>
+            )}
+          </div>
+        </div>
         {!materials.length && (
           <div className="empty-state">
             <strong>还没有材料</strong>
@@ -687,7 +750,13 @@ export default function HomePage() {
                 </div>
                 <div className="material-grid">
                   {rows.map((item) => (
-                    <article className="material-card" key={item.id}>
+                    <article className={`material-card ${selectedIds.includes(item.id) ? "material-card-selected" : ""}`} key={item.id}>
+                      {bulkMode && (
+                        <label className="select-check">
+                          <input type="checkbox" checked={selectedIds.includes(item.id)} onChange={() => toggleSelectMaterial(item.id)} />
+                          <span>选择</span>
+                        </label>
+                      )}
                       <div className="flex items-start justify-between gap-3">
                         <h3 className="font-bold text-lg">{item.name}</h3>
                         <span className="pill">{item.status}</span>
