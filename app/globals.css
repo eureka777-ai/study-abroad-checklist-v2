@@ -14,6 +14,7 @@
   --green: #15803d;
   --danger: #dc2626;
   --shadow: 0 8px 28px rgba(0, 0, 0, 0.055);
+  --display-font: "American Typewriter", "Courier Prime", "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", monospace;
 }
 
 * {
@@ -65,9 +66,17 @@ textarea {
 .eyebrow {
   margin: 0 0 10px;
   color: var(--primary);
+  font-family: var(--display-font);
   font-size: 16px;
   font-weight: 700;
   letter-spacing: 0;
+  text-transform: lowercase;
+}
+
+.brand-title {
+  color: var(--primary);
+  font-family: var(--display-font);
+  text-transform: lowercase;
 }
 
 .hero h1 {
@@ -586,7 +595,7 @@ textarea {
 
 .dashboard-copy h1 {
   margin: 0 0 12px;
-  font-size: clamp(46px, 6vw, 72px);
+  font-size: clamp(58px, 8vw, 104px);
   font-weight: 760;
   line-height: 1;
   letter-spacing: 0;
@@ -1121,6 +1130,23 @@ textarea {
   padding: 26px;
 }
 
+.feedback-modal {
+  display: grid;
+  width: min(560px, 100%);
+  gap: 16px;
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.18);
+  padding: 26px;
+}
+
+.feedback-modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
 .template-import-modal {
   width: min(680px, 100%);
   max-height: min(82vh, 760px);
@@ -1378,11 +1404,18 @@ textarea {
   margin-top: 16px;
 }
 
-.feedback-button {
+.floating-actions {
   position: fixed;
   right: 22px;
   bottom: 22px;
   z-index: 45;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.floating-action-button {
   border: 1px solid var(--line);
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.88);
@@ -1396,7 +1429,7 @@ textarea {
   transition: transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
 }
 
-.feedback-button:hover {
+.floating-action-button:hover {
   transform: translateY(-2px);
   background: rgba(255, 255, 255, 0.98);
   box-shadow: 0 18px 52px rgba(0, 0, 0, 0.16);
@@ -1491,9 +1524,13 @@ textarea {
     justify-content: space-between;
   }
 
-  .feedback-button {
+  .floating-actions {
     right: 14px;
     bottom: 14px;
+  }
+
+  .feedback-modal {
+    padding: 20px;
   }
 
   .share-link-row {

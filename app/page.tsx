@@ -652,6 +652,9 @@ export default function HomePage() {
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [templateImportOpen, setTemplateImportOpen] = useState(false);
+  const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
+  const [feedbackText, setFeedbackText] = useState("");
+  const [feedbackContact, setFeedbackContact] = useState("");
   const [customTemplates, setCustomTemplates] = useState<CustomTemplate[]>([]);
   const [authMode, setAuthMode] = useState<"login" | "signup" | "forgot">("login");
   const [email, setEmail] = useState("");
@@ -691,10 +694,10 @@ export default function HomePage() {
   }, [session]);
 
   useEffect(() => {
-    const hasOpenModal = addModalOpen || shareModalOpen || templateImportOpen || Boolean(editingId);
+    const hasOpenModal = addModalOpen || shareModalOpen || templateImportOpen || feedbackModalOpen || Boolean(editingId);
     document.body.classList.toggle("modal-open", hasOpenModal);
     return () => document.body.classList.remove("modal-open");
-  }, [addModalOpen, shareModalOpen, templateImportOpen, editingId]);
+  }, [addModalOpen, shareModalOpen, templateImportOpen, feedbackModalOpen, editingId]);
 
   const stats = useMemo(() => {
     const applicable = materials.filter((item) => item.status !== "不适用");
@@ -753,6 +756,14 @@ export default function HomePage() {
     if (formErrors[key]) {
       setFormErrors((current) => ({ ...current, [key]: undefined }));
     }
+  }
+
+  function scrollToTemplates() {
+    const templateSection = document.getElementById("templates-section") as HTMLDetailsElement | null;
+    if (templateSection) templateSection.open = true;
+    window.setTimeout(() => {
+      templateSection?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 80);
   }
 
   async function handleAuth(event: FormEvent) {
@@ -1110,6 +1121,26 @@ export default function HomePage() {
     }
   }
 
+  function saveFeedback(event: FormEvent) {
+    event.preventDefault();
+    if (!feedbackText.trim()) {
+      toast.error("先写一点反馈内容吧");
+      return;
+    }
+    const saved = window.localStorage.getItem("pathfolio-feedback-drafts");
+    const rows = saved ? JSON.parse(saved) as Array<{ text: string; contact: string; createdAt: string }> : [];
+    const nextRows = [{
+      text: feedbackText.trim(),
+      contact: feedbackContact.trim(),
+      createdAt: new Date().toISOString()
+    }, ...rows].slice(0, 30);
+    window.localStorage.setItem("pathfolio-feedback-drafts", JSON.stringify(nextRows));
+    setFeedbackText("");
+    setFeedbackContact("");
+    setFeedbackModalOpen(false);
+    toast.success("反馈已保存，谢谢你");
+  }
+
   function renderMaterialForm(submitLabel: string) {
     return (
       <form className="grid-form" onSubmit={saveMaterial}>
@@ -1149,6 +1180,42 @@ export default function HomePage() {
     );
   }
 
+  function renderFloatingActions(showLogout = false) {
+    return (
+      <>
+        <div className="floating-actions" aria-label="页面快捷操作">
+          <button className="floating-action-button" type="button" onClick={() => setFeedbackModalOpen(true)}>反馈</button>
+          {showLogout && <button className="floating-action-button" type="button" onClick={logout}>退出登录</button>}
+        </div>
+        {feedbackModalOpen && (
+          <div className="modal-backdrop" role="dialog" aria-modal="true" aria-label="提交反馈">
+            <form className="feedback-modal" onSubmit={saveFeedback}>
+              <div className="share-modal-head">
+                <div>
+                  <h2>反馈</h2>
+                  <p>告诉我哪里不好用、哪里看不懂，或者你希望下一个版本加什么。</p>
+                </div>
+                <button className="icon-close" type="button" onClick={() => setFeedbackModalOpen(false)} aria-label="关闭反馈弹窗">×</button>
+              </div>
+              <label className="label">
+                你的建议
+                <textarea className="input" rows={5} value={feedbackText} onChange={(event) => setFeedbackText(event.target.value)} placeholder="例如：模板太多、按钮不明显、某个签证材料不准..." />
+              </label>
+              <label className="label">
+                联系方式，可选
+                <input className="input" value={feedbackContact} onChange={(event) => setFeedbackContact(event.target.value)} placeholder="邮箱 / 微信 / 备注" />
+              </label>
+              <div className="feedback-modal-actions">
+                <button className="button button-primary" type="submit">提交反馈</button>
+                <a className="button button-soft" href={FEEDBACK_URL} target="_blank" rel="noopener noreferrer">打开表单</a>
+              </div>
+            </form>
+          </div>
+        )}
+      </>
+    );
+  }
+
   if (!SUPABASE_URL || !SUPABASE_KEY) {
     return (
       <main className="page">
@@ -1156,7 +1223,7 @@ export default function HomePage() {
           <h1 className="text-3xl font-bold">还差环境变量</h1>
           <p className="subtle mt-3">请先创建 .env.local，填入 Supabase URL 和 Publishable key。</p>
         </section>
-        <a className="feedback-button" href={FEEDBACK_URL} target="_blank" rel="noopener noreferrer">反馈</a>
+        {renderFloatingActions(false)}
       </main>
     );
   }
@@ -1166,7 +1233,7 @@ export default function HomePage() {
       <main className="page">
         <section className="hero hero-landing">
           <div className="hero-copy">
-            <p className="eyebrow">Pathfolio</p>
+            <p className="eyebrow" lang="en">pathfolio</p>
             <h1>从申请到签证，一页管理所有材料</h1>
             <p className="subtle">从学校申请到学生签证、旅游签、住宿和行前准备，把跨国材料整理成一个清晰的进度页。</p>
             <div className="hero-actions">
@@ -1284,7 +1351,7 @@ export default function HomePage() {
             </article>
           </div>
         </section>
-        <a className="feedback-button" href={FEEDBACK_URL} target="_blank" rel="noopener noreferrer">反馈</a>
+        {renderFloatingActions(false)}
       </main>
     );
   }
@@ -1293,12 +1360,8 @@ export default function HomePage() {
     <main className="page dashboard-page">
       <section className="dashboard-hero">
         <div className="dashboard-copy">
-          <p className="eyebrow">Pathfolio</p>
-          <h1>我的材料路径</h1>
+          <h1 className="brand-title" lang="en">pathfolio</h1>
           <p className="subtle">按国家、申请阶段、签证类型和行前任务整理材料。你更新进度，家人只读查看。</p>
-          <div className="quick-actions">
-            <button className="button button-plain" type="button" onClick={logout}>退出登录</button>
-          </div>
         </div>
 
         <div className="progress-panel">
@@ -1339,11 +1402,11 @@ export default function HomePage() {
         <div className="next-step-actions">
           {nextMaterial?.source_url && <a className="button button-soft" href={nextMaterial.source_url} target="_blank" rel="noopener noreferrer">官方入口</a>}
           {nextMaterial && <button className="button button-primary" type="button" onClick={() => quickConfirm(nextMaterial)}>一键确认</button>}
-          {!materials.length && <button className="button button-primary" type="button" onClick={() => document.querySelector(".template-grid")?.scrollIntoView({ behavior: "smooth", block: "start" })}>去选择模板</button>}
+          {!materials.length && <button className="button button-primary" type="button" onClick={scrollToTemplates}>去选择模板</button>}
         </div>
       </section>
 
-      <details className="card panel section-details" open>
+      <details className="card panel section-details" id="templates-section" open>
         <summary className="section-summary">
           <div>
             <p className="eyebrow">Templates</p>
@@ -1610,7 +1673,7 @@ export default function HomePage() {
             <p>选择一个模板，系统会帮你生成第一版；也可以手动添加第一项材料。</p>
             <div className="empty-actions">
               <button className="button button-primary" type="button" onClick={openAddMaterialModal}>添加第一项材料</button>
-              <button className="button button-soft" type="button" onClick={() => document.querySelector(".template-grid")?.scrollIntoView({ behavior: "smooth", block: "start" })}>从模板添加</button>
+              <button className="button button-soft" type="button" onClick={scrollToTemplates}>从模板添加</button>
               <a className="button button-plain" href="/demo">查看示例清单</a>
             </div>
           </div>
@@ -1661,7 +1724,7 @@ export default function HomePage() {
           })}
         </div>
       </details>
-      <a className="feedback-button" href={FEEDBACK_URL} target="_blank" rel="noopener noreferrer">反馈</a>
+      {renderFloatingActions(true)}
     </main>
   );
 }
