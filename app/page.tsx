@@ -606,6 +606,7 @@ export default function HomePage() {
   const [formErrors, setFormErrors] = useState<FormErrors>({});
   const [editingId, setEditingId] = useState<string | null>(null);
   const [addModalOpen, setAddModalOpen] = useState(false);
+  const [shareModalOpen, setShareModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<"login" | "signup" | "forgot">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -622,8 +623,6 @@ export default function HomePage() {
   const [bulkStatus, setBulkStatus] = useState("已确认");
 
   const shareUrl = profile ? `${window.location.origin}/share/${profile.share_slug}` : "";
-  const shareUrlLabel = shareUrl || "正在生成分享链接...";
-
   useEffect(() => {
     const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""));
     const token = hash.get("access_token");
@@ -644,10 +643,10 @@ export default function HomePage() {
   }, [session]);
 
   useEffect(() => {
-    const hasOpenModal = addModalOpen || Boolean(editingId);
+    const hasOpenModal = addModalOpen || shareModalOpen || Boolean(editingId);
     document.body.classList.toggle("modal-open", hasOpenModal);
     return () => document.body.classList.remove("modal-open");
-  }, [addModalOpen, editingId]);
+  }, [addModalOpen, shareModalOpen, editingId]);
 
   const stats = useMemo(() => {
     const applicable = materials.filter((item) => item.status !== "不适用");
@@ -1214,7 +1213,6 @@ export default function HomePage() {
           <p className="subtle">按国家、申请阶段、签证类型和行前任务整理材料。你更新进度，家人只读查看。</p>
           <div className="quick-actions">
             <button className="button button-primary" type="button" onClick={addSeedMaterials} disabled={busyTemplate === "默认材料"}>{busyTemplate === "默认材料" ? "添加中..." : "添加默认材料"}</button>
-            <button className="button button-soft" type="button" onClick={copyShareUrl}>复制分享链接</button>
             <button className="button button-plain" type="button" onClick={logout}>退出登录</button>
           </div>
         </div>
@@ -1236,15 +1234,10 @@ export default function HomePage() {
             <span className="stat">确认<strong>{stats.confirmed}</strong></span>
             <span className="stat">不适用<strong>{stats.notApplicable}</strong></span>
           </div>
+          <button className="button button-soft progress-share-button" type="button" onClick={() => setShareModalOpen(true)}>
+            家庭只读分享
+          </button>
         </div>
-      </section>
-
-      <section className="share-bar">
-        <div>
-          <h2>家庭只读分享</h2>
-          <p>爸妈可以看到最新进度，但不能编辑你的材料。</p>
-        </div>
-        <code>{shareUrlLabel}</code>
       </section>
 
       <section className="next-step-card">
@@ -1359,6 +1352,43 @@ export default function HomePage() {
               <button className="button button-soft" type="button" onClick={closeMaterialModal}>关闭</button>
             </div>
             {renderMaterialForm("添加材料")}
+          </div>
+        </div>
+      )}
+
+      {shareModalOpen && (
+        <div className="modal-backdrop" role="dialog" aria-modal="true" aria-label="家庭只读分享">
+          <div className="share-modal">
+            <div className="share-modal-head">
+              <div>
+                <h2>共享材料进度</h2>
+                <p>只分享截至目前的材料状态，家人可以查看，但不能编辑。</p>
+              </div>
+              <button className="icon-close" type="button" onClick={() => setShareModalOpen(false)} aria-label="关闭分享弹窗">×</button>
+            </div>
+            <div className="share-options">
+              <div className="share-option share-option-active">
+                <span className="share-option-icon">⌁</span>
+                <div>
+                  <strong>私人</strong>
+                  <p>只有你登录后可以编辑</p>
+                </div>
+                <span className="share-radio share-radio-active" />
+              </div>
+              <div className="share-option">
+                <span className="share-option-icon">◎</span>
+                <div>
+                  <strong>创建共享链接</strong>
+                  <p>拥有链接的家人可以查看最新进度</p>
+                </div>
+                <span className="share-radio" />
+              </div>
+            </div>
+            <p className="share-warning">分享前，请检查备注和材料里是否包含敏感信息。这个链接是只读的，家人不能改你的清单。</p>
+            <div className="share-link-row">
+              <code>{shareUrl || "正在生成分享链接..."}</code>
+              <button className="button button-primary" type="button" onClick={copyShareUrl}>复制链接</button>
+            </div>
           </div>
         </div>
       )}
