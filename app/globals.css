@@ -617,6 +617,8 @@ textarea {
 .section-details .timeline,
 .section-details .empty-state,
 .section-details .feedback,
+.section-details .template-filters,
+.section-details .template-result-row,
 .section-details .section-note {
   margin-left: 24px;
   margin-right: 24px;
@@ -700,7 +702,7 @@ textarea {
 
 .filter-group {
   display: grid;
-  grid-template-columns: 88px minmax(0, 1fr);
+  grid-template-columns: 108px minmax(0, 1fr);
   gap: 12px;
   align-items: center;
 }
@@ -709,6 +711,7 @@ textarea {
   color: var(--muted);
   font-size: 13px;
   font-weight: 700;
+  white-space: nowrap;
 }
 
 .filter-scroll {
