@@ -199,6 +199,25 @@ const templateCards = [
     ]
   },
   {
+    title: "美国留学申请",
+    description: "适合申请美国本科、硕士、博士和交换项目。",
+    meta: "成绩 · 语言 · 文书",
+    materials: [
+      { name: "护照", category: "签证材料", stage: "申请准备", next_action: "确认有效期，后续申请学校和 F-1 签证都会用到。" },
+      { name: "中英文成绩单", category: "学术材料", stage: "申请准备", next_action: "向学校申请官方中英文成绩单，部分学校可能要求 WES 等认证。", requirement_level: "必需" },
+      { name: "毕业证 / 在读证明", category: "学术材料", stage: "申请准备", requirement_level: "视情况需要", next_action: "已毕业准备毕业证和学位证；未毕业准备在读证明。" },
+      { name: "语言成绩 TOEFL / IELTS / Duolingo", category: "语言材料", stage: "申请准备", next_action: "按目标学校要求送分或上传成绩。" },
+      { name: "GRE / GMAT / SAT / ACT", category: "学术材料", stage: "申请准备", requirement_level: "视情况需要", next_action: "根据项目要求确认是否需要标化考试。" },
+      { name: "个人陈述 Personal Statement", category: "申请材料", stage: "提交申请", next_action: "说明申请动机、学术背景、项目匹配度和未来计划。" },
+      { name: "简历 CV / Resume", category: "申请材料", stage: "提交申请", next_action: "整理教育经历、科研、实习、项目和技能。" },
+      { name: "推荐信", category: "申请材料", stage: "提交申请", next_action: "提前联系推荐人，确认学校系统提交方式。" },
+      { name: "作品集 / Writing Sample", category: "申请材料", stage: "提交申请", requirement_level: "视情况需要", next_action: "艺术、建筑、传媒、研究型项目可能需要额外作品或写作样本。" },
+      { name: "财力证明", category: "签证材料", stage: "等待 Offer", requirement_level: "视情况需要", next_action: "部分学校发 I-20 前会要求提交资金证明。" },
+      { name: "录取信 / Admission Letter", category: "申请材料", stage: "等待 Offer", next_action: "提交申请后等待学校审核和录取结果。" },
+      { name: "入学押金付款证明", category: "付款材料", stage: "换 Unconditional", requirement_level: "视情况需要", next_action: "确认入读学校后按要求支付 enrollment deposit 并保存收据。" }
+    ]
+  },
+  {
     title: "美国 F-1 学生签证",
     description: "适合去美国读书的学生签证准备。",
     meta: "I-20 · SEVIS · DS-160",
@@ -210,8 +229,301 @@ const templateCards = [
       { name: "录取信", category: "申请材料", stage: "CAS 与签证", next_action: "准备学校 offer 或 admission letter。" },
       { name: "资金证明", category: "签证材料", stage: "CAS 与签证", next_action: "准备覆盖学费和生活费的资金说明。" }
     ]
+  },
+  {
+    title: "加拿大留学申请",
+    description: "适合申请加拿大大学、学院和研究生项目。",
+    meta: "学术 · 语言 · Offer",
+    materials: [
+      { name: "护照", category: "签证材料", stage: "申请准备", next_action: "确认有效期，后续申请学校和学习许可都会用到。" },
+      { name: "中英文成绩单", category: "学术材料", stage: "申请准备", next_action: "向学校申请官方中英文成绩单。" },
+      { name: "毕业证 / 在读证明", category: "学术材料", stage: "申请准备", requirement_level: "视情况需要", next_action: "已毕业准备毕业证；未毕业准备在读证明。" },
+      { name: "语言成绩", category: "语言材料", stage: "申请准备", next_action: "按学校要求准备 IELTS、TOEFL、Duolingo 等成绩。" },
+      { name: "个人陈述 / Study Plan", category: "申请材料", stage: "提交申请", requirement_level: "视情况需要", next_action: "按项目要求说明学习背景、目标和选校原因。" },
+      { name: "推荐信", category: "申请材料", stage: "提交申请", requirement_level: "视情况需要", next_action: "提前联系老师或上级确认推荐方式。" },
+      { name: "录取通知书", category: "申请材料", stage: "等待 Offer", next_action: "提交申请后等待学校发放 offer。" },
+      { name: "学费押金付款证明", category: "付款材料", stage: "住宿与付款", requirement_level: "视情况需要", next_action: "按学校要求支付押金后保存收据。" }
+    ]
+  },
+  {
+    title: "加拿大学习许可",
+    description: "适合去加拿大长期学习，需要准备 Study Permit。",
+    meta: "LOA · PAL · 资金",
+    materials: [
+      { name: "录取通知书 LOA", category: "申请材料", stage: "CAS 与签证", next_action: "准备加拿大学校发放的 Letter of Acceptance。", source_name: "IRCC Study permit", source_url: "https://www.canada.ca/en/immigration-refugees-citizenship/services/study-canada/study-permit.html" },
+      { name: "省级证明信 PAL / TAL", category: "签证材料", stage: "CAS 与签证", requirement_level: "视情况需要", next_action: "确认自己是否需要 PAL 或 TAL，通常由学校协助提供。" },
+      { name: "护照", category: "签证材料", stage: "CAS 与签证", next_action: "确认有效期覆盖学习计划。" },
+      { name: "资金证明", category: "签证材料", stage: "CAS 与签证", next_action: "准备学费、生活费和返程费用相关证明。" },
+      { name: "学习计划 Study Plan", category: "签证材料", stage: "CAS 与签证", requirement_level: "视情况需要", next_action: "说明学习目的、课程选择和回国/未来计划。" },
+      { name: "体检回执", category: "签证材料", stage: "CAS 与签证", requirement_level: "视情况需要", next_action: "按 IRCC 要求确认是否需要提前体检。" },
+      { name: "生物识别预约 / 回执", category: "签证材料", stage: "CAS 与签证", requirement_level: "视情况需要", next_action: "提交申请后按要求预约并完成 biometrics。" }
+    ]
+  },
+  {
+    title: "澳洲留学申请",
+    description: "适合申请澳洲本科、硕士和语言课程。",
+    meta: "学术 · 语言 · CoE",
+    materials: [
+      { name: "护照", category: "签证材料", stage: "申请准备", next_action: "确认有效期，学校申请和签证都会用到。" },
+      { name: "中英文成绩单", category: "学术材料", stage: "申请准备", next_action: "准备官方中英文版本。" },
+      { name: "毕业证 / 在读证明", category: "学术材料", stage: "申请准备", requirement_level: "视情况需要", next_action: "按学历阶段准备毕业证明或在读证明。" },
+      { name: "语言成绩", category: "语言材料", stage: "申请准备", next_action: "按学校要求准备 IELTS、PTE、TOEFL 等成绩。" },
+      { name: "个人陈述 / 简历", category: "申请材料", stage: "提交申请", requirement_level: "视情况需要", next_action: "按专业要求准备 PS、CV 或作品集。" },
+      { name: "Offer", category: "申请材料", stage: "等待 Offer", next_action: "提交申请后等待学校发放录取。" },
+      { name: "接受 Offer 确认", category: "申请材料", stage: "换 Unconditional", next_action: "按学校要求接受录取并确认入学条件。" },
+      { name: "CoE", category: "签证材料", stage: "CAS 与签证", next_action: "缴费并满足入学条件后，由学校发放 Confirmation of Enrolment。" }
+    ]
+  },
+  {
+    title: "澳洲学生签证 500",
+    description: "适合申请澳洲 Subclass 500 学生签证。",
+    meta: "CoE · OSHC · GTE",
+    materials: [
+      { name: "CoE", category: "签证材料", stage: "CAS 与签证", next_action: "准备学校发放的 Confirmation of Enrolment。", source_name: "Australia Student visa 500", source_url: "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/student-500" },
+      { name: "护照", category: "签证材料", stage: "CAS 与签证", next_action: "确认有效期和个人信息。" },
+      { name: "OSHC 海外学生保险", category: "签证材料", stage: "CAS 与签证", next_action: "购买覆盖学习期间的 Overseas Student Health Cover。" },
+      { name: "资金证明", category: "签证材料", stage: "CAS 与签证", requirement_level: "视情况需要", next_action: "按签证系统和个人情况准备资金材料。" },
+      { name: "Genuine Student 说明", category: "签证材料", stage: "CAS 与签证", next_action: "说明真实学习目的、课程选择和未来计划。" },
+      { name: "体检", category: "签证材料", stage: "CAS 与签证", requirement_level: "视情况需要", next_action: "按签证系统提示预约体检。" },
+      { name: "学历和语言材料", category: "学术材料", stage: "CAS 与签证", requirement_level: "视情况需要", next_action: "按签证材料清单上传成绩、学历和语言证明。" }
+    ]
+  },
+  {
+    title: "新西兰学生签证",
+    description: "适合去新西兰长期学习的学生。",
+    meta: "Offer · 资金 · 保险",
+    materials: [
+      { name: "录取通知书", category: "申请材料", stage: "CAS 与签证", next_action: "准备新西兰学校发放的 offer of place。", source_name: "Immigration New Zealand Student visa", source_url: "https://www.immigration.govt.nz/new-zealand-visas/visas/visa/full-fee-paying-student-visa" },
+      { name: "护照", category: "签证材料", stage: "CAS 与签证", next_action: "确认有效期。" },
+      { name: "资金证明", category: "签证材料", stage: "CAS 与签证", next_action: "准备覆盖学费、生活费和返程安排的资金材料。" },
+      { name: "学费付款证明", category: "付款材料", stage: "住宿与付款", requirement_level: "视情况需要", next_action: "按学校和签证要求保存付款证明。" },
+      { name: "住宿安排", category: "住宿材料", stage: "住宿与付款", requirement_level: "视情况需要", next_action: "准备学校住宿、租房或寄宿家庭信息。" },
+      { name: "保险证明", category: "其他", stage: "行前准备", requirement_level: "视情况需要", next_action: "确认学校或签证是否要求医疗/旅行保险。" },
+      { name: "体检 / 无犯罪证明", category: "签证材料", stage: "CAS 与签证", requirement_level: "视情况需要", next_action: "按停留时长和系统提示确认是否需要。" }
+    ]
+  },
+  {
+    title: "欧洲留学申请通用",
+    description: "适合德国、法国、荷兰、爱尔兰等欧洲院校申请前期。",
+    meta: "学术 · 语言 · 动机信",
+    materials: [
+      { name: "护照", category: "签证材料", stage: "申请准备", next_action: "确认有效期。" },
+      { name: "中英文成绩单", category: "学术材料", stage: "申请准备", next_action: "准备学校认可的官方版本，必要时做公证或认证。" },
+      { name: "毕业证 / 在读证明", category: "学术材料", stage: "申请准备", next_action: "按学校要求准备学历证明。" },
+      { name: "语言成绩", category: "语言材料", stage: "申请准备", next_action: "按项目语言准备 IELTS、TOEFL、德语、法语等证明。" },
+      { name: "动机信 Motivation Letter", category: "申请材料", stage: "提交申请", next_action: "说明选校、选专业原因和未来规划。" },
+      { name: "简历 CV", category: "申请材料", stage: "提交申请", next_action: "整理教育经历、项目经历、实习和技能。" },
+      { name: "推荐信", category: "申请材料", stage: "提交申请", requirement_level: "视情况需要", next_action: "按项目要求联系推荐人。" },
+      { name: "课程描述 / Syllabus", category: "学术材料", stage: "提交申请", requirement_level: "视情况需要", next_action: "部分欧洲学校会要求课程描述用于匹配学分。" },
+      { name: "录取通知书", category: "申请材料", stage: "等待 Offer", next_action: "提交申请后等待学校审核。" }
+    ]
+  },
+  {
+    title: "德国学生签证",
+    description: "适合去德国读本科、硕士或语言预科。",
+    meta: "录取 · APS · 资金",
+    materials: [
+      { name: "德国大学录取通知书", category: "申请材料", stage: "CAS 与签证", next_action: "准备德国学校的 Zulassung 或 admission letter。" },
+      { name: "护照", category: "签证材料", stage: "CAS 与签证", next_action: "确认有效期和空白页。" },
+      { name: "签证申请表", category: "签证材料", stage: "CAS 与签证", next_action: "按德国使领馆或签证中心要求填写。", source_name: "German Missions visa information", source_url: "https://china.diplo.de/cn-zh/service/visa-einreise" },
+      { name: "APS 证书", category: "学术材料", stage: "CAS 与签证", requirement_level: "视情况需要", next_action: "中国大陆学历申请德国通常需关注 APS 审核要求。" },
+      { name: "资金证明 / Sperrkonto", category: "签证材料", stage: "CAS 与签证", next_action: "按德国签证要求准备自保金或奖学金证明。" },
+      { name: "医疗保险证明", category: "签证材料", stage: "CAS 与签证", next_action: "准备德国认可的保险证明。" },
+      { name: "学历和语言材料", category: "学术材料", stage: "CAS 与签证", next_action: "准备学历、成绩和语言证明。" }
+    ]
+  },
+  {
+    title: "法国学生签证",
+    description: "适合去法国长期学习，需要关注 Etudes en France 流程。",
+    meta: "EEF · 录取 · 长居签",
+    materials: [
+      { name: "学校录取通知书", category: "申请材料", stage: "CAS 与签证", next_action: "准备法国学校录取或预注册证明。" },
+      { name: "Etudes en France 材料", category: "申请材料", stage: "CAS 与签证", requirement_level: "视情况需要", next_action: "按 Campus France / EEF 流程填写并提交材料。", source_name: "Campus France China", source_url: "https://www.chine.campusfrance.org/" },
+      { name: "长期签证申请表", category: "签证材料", stage: "CAS 与签证", next_action: "按 France-Visas 官方流程填写。", source_name: "France-Visas", source_url: "https://france-visas.gouv.fr/" },
+      { name: "护照", category: "签证材料", stage: "CAS 与签证", next_action: "确认有效期。" },
+      { name: "资金证明", category: "签证材料", stage: "CAS 与签证", next_action: "按法国签证要求准备生活费和学费证明。" },
+      { name: "住宿证明", category: "住宿材料", stage: "住宿与付款", requirement_level: "视情况需要", next_action: "准备住房证明、接待证明或临时住宿安排。" },
+      { name: "学历和语言材料", category: "学术材料", stage: "CAS 与签证", next_action: "准备学历、成绩、语言证明和翻译件。" }
+    ]
+  },
+  {
+    title: "荷兰学生签证",
+    description: "适合去荷兰读书，通常由学校协助 MVV / residence permit。",
+    meta: "录取 · MVV · 资金",
+    materials: [
+      { name: "荷兰学校录取通知书", category: "申请材料", stage: "CAS 与签证", next_action: "准备学校 admission letter。" },
+      { name: "护照", category: "签证材料", stage: "CAS 与签证", next_action: "确认有效期。" },
+      { name: "学校签证申请包", category: "签证材料", stage: "CAS 与签证", next_action: "荷兰学生居留通常由学校作为担保方发起，请按学校要求提交材料。", source_name: "IND Study in the Netherlands", source_url: "https://ind.nl/en/residence-permits/study" },
+      { name: "资金证明", category: "签证材料", stage: "CAS 与签证", next_action: "按学校和 IND 要求准备生活费证明。" },
+      { name: "Antecedents Certificate", category: "签证材料", stage: "CAS 与签证", requirement_level: "视情况需要", next_action: "按学校提供的表格确认是否需要签署。" },
+      { name: "结核检测预约 / TB test", category: "签证材料", stage: "到校注册", requirement_level: "视情况需要", next_action: "抵达后按 IND 或 GGD 要求确认是否需要 TB 检测。" },
+      { name: "住宿安排", category: "住宿材料", stage: "住宿与付款", requirement_level: "视情况需要", next_action: "荷兰住宿紧张，建议尽早确认租房或学校住宿。" }
+    ]
+  },
+  {
+    title: "爱尔兰学生签证",
+    description: "适合去爱尔兰读语言、本科、硕士等课程。",
+    meta: "Offer · 学费 · 资金",
+    materials: [
+      { name: "学校录取通知书", category: "申请材料", stage: "CAS 与签证", next_action: "准备爱尔兰学校 offer 或 acceptance letter。", source_name: "Irish Immigration study visa", source_url: "https://www.irishimmigration.ie/coming-to-study-in-ireland/" },
+      { name: "护照", category: "签证材料", stage: "CAS 与签证", next_action: "确认有效期。" },
+      { name: "签证申请表 / AVATS", category: "签证材料", stage: "CAS 与签证", next_action: "通过爱尔兰官方在线系统填写申请。" },
+      { name: "学费付款证明", category: "付款材料", stage: "住宿与付款", requirement_level: "视情况需要", next_action: "按课程和签证要求保存学费付款记录。" },
+      { name: "资金证明", category: "签证材料", stage: "CAS 与签证", next_action: "准备生活费、学费和资金来源材料。" },
+      { name: "学历和语言材料", category: "学术材料", stage: "CAS 与签证", next_action: "准备成绩、学历、语言成绩和翻译件。" },
+      { name: "医疗保险", category: "其他", stage: "行前准备", requirement_level: "视情况需要", next_action: "按学校或签证要求购买医疗保险。" }
+    ]
+  },
+  {
+    title: "新加坡留学申请",
+    description: "适合申请新加坡本科、硕士和私立院校课程。",
+    meta: "学术 · 语言 · Offer",
+    materials: [
+      { name: "护照", category: "签证材料", stage: "申请准备", next_action: "确认有效期，后续学校申请和学生准证都会用到。" },
+      { name: "中英文成绩单", category: "学术材料", stage: "申请准备", next_action: "准备学校认可的官方成绩单。" },
+      { name: "毕业证 / 在读证明", category: "学术材料", stage: "申请准备", requirement_level: "视情况需要", next_action: "按当前学历阶段准备。" },
+      { name: "语言成绩", category: "语言材料", stage: "申请准备", requirement_level: "视情况需要", next_action: "按学校要求准备 IELTS、TOEFL 或其他英语证明。" },
+      { name: "个人陈述 / 简历", category: "申请材料", stage: "提交申请", requirement_level: "视情况需要", next_action: "按项目要求准备 PS、CV 或面试材料。" },
+      { name: "推荐信", category: "申请材料", stage: "提交申请", requirement_level: "视情况需要", next_action: "研究生项目通常需要提前联系推荐人。" },
+      { name: "录取通知书", category: "申请材料", stage: "等待 Offer", next_action: "提交申请后等待学校录取结果。" }
+    ]
+  },
+  {
+    title: "新加坡学生准证",
+    description: "适合拿到新加坡学校录取后的 Student's Pass 准备。",
+    meta: "IPA · SOLAR · 体检",
+    materials: [
+      { name: "学校录取通知书", category: "申请材料", stage: "CAS 与签证", next_action: "准备新加坡学校发放的录取文件。" },
+      { name: "Student's Pass 申请信息", category: "签证材料", stage: "CAS 与签证", next_action: "按学校指引进入 ICA / SOLAR 流程。", source_name: "Singapore ICA Student's Pass", source_url: "https://www.ica.gov.sg/reside/STP/apply" },
+      { name: "护照", category: "签证材料", stage: "CAS 与签证", next_action: "确认有效期和个人信息。" },
+      { name: "照片", category: "签证材料", stage: "CAS 与签证", next_action: "按 ICA 照片规格准备电子照片。" },
+      { name: "IPA Letter", category: "签证材料", stage: "CAS 与签证", next_action: "申请获批后保存 IPA，用于入境和后续换取学生准证。" },
+      { name: "体检报告", category: "签证材料", stage: "到校注册", requirement_level: "视情况需要", next_action: "按学校或 ICA 要求完成体检。" },
+      { name: "学费付款证明", category: "付款材料", stage: "住宿与付款", requirement_level: "视情况需要", next_action: "保存学校缴费记录。" }
+    ]
+  },
+  {
+    title: "中国香港留学申请",
+    description: "适合申请香港高校本科、硕士和研究型项目。",
+    meta: "学术 · 语言 · Offer",
+    materials: [
+      { name: "身份证明 / 护照", category: "签证材料", stage: "申请准备", next_action: "按学校系统要求准备身份证、港澳通行证或护照信息。" },
+      { name: "中英文成绩单", category: "学术材料", stage: "申请准备", next_action: "向学校申请官方中英文成绩单。" },
+      { name: "毕业证 / 在读证明", category: "学术材料", stage: "申请准备", requirement_level: "视情况需要", next_action: "根据是否毕业准备对应证明。" },
+      { name: "语言成绩", category: "语言材料", stage: "申请准备", next_action: "按学校要求准备 IELTS、TOEFL、CET 等证明。" },
+      { name: "个人陈述 / 研究计划", category: "申请材料", stage: "提交申请", requirement_level: "视情况需要", next_action: "授课型通常准备 PS；研究型通常准备 research proposal。" },
+      { name: "推荐信", category: "申请材料", stage: "提交申请", requirement_level: "视情况需要", next_action: "按项目要求联系推荐人。" },
+      { name: "录取通知书", category: "申请材料", stage: "等待 Offer", next_action: "提交申请后等待学校录取。" }
+    ]
+  },
+  {
+    title: "中国香港学生签证",
+    description: "适合拿到香港学校录取后的学生签证 / 入境许可准备。",
+    meta: "ID995A · 录取 · 资金",
+    materials: [
+      { name: "录取通知书", category: "申请材料", stage: "CAS 与签证", next_action: "准备香港学校发放的正式录取文件。" },
+      { name: "ID995A 申请表", category: "签证材料", stage: "CAS 与签证", next_action: "按香港入境处或学校指引填写学生签证申请表。", source_name: "Hong Kong Immigration Department", source_url: "https://www.immd.gov.hk/eng/services/visas/study.html" },
+      { name: "身份证明 / 护照复印件", category: "签证材料", stage: "CAS 与签证", next_action: "按学校和入境处要求准备个人身份证明。" },
+      { name: "资金证明", category: "签证材料", stage: "CAS 与签证", next_action: "准备覆盖学费和生活费的资金材料。" },
+      { name: "住宿证明", category: "住宿材料", stage: "住宿与付款", requirement_level: "视情况需要", next_action: "如已有宿舍或租房安排，保存相关证明。" },
+      { name: "签证标签 / e-Visa", category: "签证材料", stage: "行前准备", next_action: "获批后保存电子签证或签证标签文件。" }
+    ]
+  },
+  {
+    title: "西班牙学生签证",
+    description: "适合去西班牙读语言、本科、硕士或交换项目。",
+    meta: "录取 · 资金 · 保险",
+    materials: [
+      { name: "学校录取通知书", category: "申请材料", stage: "CAS 与签证", next_action: "准备西班牙学校或语言中心的录取证明。" },
+      { name: "签证申请表", category: "签证材料", stage: "CAS 与签证", next_action: "按西班牙签证中心或领馆要求填写。", source_name: "Spain visa information", source_url: "https://www.exteriores.gob.es/" },
+      { name: "护照", category: "签证材料", stage: "CAS 与签证", next_action: "确认有效期和空白页。" },
+      { name: "资金证明", category: "签证材料", stage: "CAS 与签证", next_action: "准备覆盖学习和生活期间的资金材料。" },
+      { name: "医疗保险", category: "签证材料", stage: "CAS 与签证", next_action: "准备符合西班牙要求的医疗保险。" },
+      { name: "住宿证明", category: "住宿材料", stage: "住宿与付款", requirement_level: "视情况需要", next_action: "准备租房、宿舍或临时住宿证明。" },
+      { name: "无犯罪 / 体检证明", category: "签证材料", stage: "CAS 与签证", requirement_level: "视情况需要", next_action: "长期学习签证可能需要，按领区要求确认。" }
+    ]
+  },
+  {
+    title: "意大利学生签证",
+    description: "适合去意大利读本科、硕士、艺术院校或交换项目。",
+    meta: "预注册 · 录取 · 资金",
+    materials: [
+      { name: "学校录取 / 预注册材料", category: "申请材料", stage: "CAS 与签证", next_action: "按学校和 Universitaly 流程确认录取或预注册状态。", source_name: "Universitaly", source_url: "https://www.universitaly.it/" },
+      { name: "签证申请表", category: "签证材料", stage: "CAS 与签证", next_action: "按意大利签证中心或领馆要求填写。" },
+      { name: "护照", category: "签证材料", stage: "CAS 与签证", next_action: "确认有效期和空白页。" },
+      { name: "资金证明", category: "签证材料", stage: "CAS 与签证", next_action: "准备生活费、学费和资金来源证明。" },
+      { name: "住宿证明", category: "住宿材料", stage: "住宿与付款", next_action: "准备租房、宿舍或接待证明。" },
+      { name: "医疗保险", category: "签证材料", stage: "CAS 与签证", next_action: "准备符合要求的医疗保险。" },
+      { name: "学历认证 / 价值声明", category: "学术材料", stage: "CAS 与签证", requirement_level: "视情况需要", next_action: "按学校、使领馆或签证中心要求确认是否需要。" }
+    ]
+  },
+  {
+    title: "加拿大旅游签",
+    description: "适合短期旅游、探亲或访问加拿大。",
+    meta: "TRV · 资金 · 行程",
+    materials: [
+      { name: "访客签证申请信息", category: "签证材料", stage: "申请准备", next_action: "按 IRCC 账号流程填写 visitor visa 申请。", source_name: "IRCC Visitor visa", source_url: "https://www.canada.ca/en/immigration-refugees-citizenship/services/visit-canada.html" },
+      { name: "护照", category: "签证材料", stage: "申请准备", next_action: "确认有效期和出入境记录。" },
+      { name: "资金证明", category: "签证材料", stage: "提交申请", next_action: "准备能覆盖旅行费用的资金证明。" },
+      { name: "行程计划", category: "签证材料", stage: "提交申请", requirement_level: "视情况需要", next_action: "准备旅行日期、城市、住宿和预算说明。" },
+      { name: "邀请信", category: "签证材料", stage: "提交申请", requirement_level: "视情况需要", next_action: "探亲访友时可准备加拿大邀请方信息。" },
+      { name: "在职 / 在读证明", category: "签证材料", stage: "提交申请", requirement_level: "视情况需要", next_action: "按个人身份准备约束力材料。" }
+    ]
+  },
+  {
+    title: "澳洲访客签证 600",
+    description: "适合去澳洲旅游、探亲或短期商务访问。",
+    meta: "600 · 行程 · 资金",
+    materials: [
+      { name: "访客签证申请信息", category: "签证材料", stage: "申请准备", next_action: "按 ImmiAccount 流程申请 Visitor visa subclass 600。", source_name: "Australia Visitor visa 600", source_url: "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/visitor-600" },
+      { name: "护照", category: "签证材料", stage: "申请准备", next_action: "确认有效期和个人信息。" },
+      { name: "资金证明", category: "签证材料", stage: "提交申请", next_action: "准备能覆盖旅行费用的资金材料。" },
+      { name: "行程计划", category: "签证材料", stage: "提交申请", requirement_level: "视情况需要", next_action: "准备旅行城市、时间和住宿安排。" },
+      { name: "邀请信 / 关系证明", category: "签证材料", stage: "提交申请", requirement_level: "视情况需要", next_action: "探亲访友时准备邀请方和关系证明。" },
+      { name: "在职 / 在读证明", category: "签证材料", stage: "提交申请", requirement_level: "视情况需要", next_action: "按个人身份准备工作或学习证明。" }
+    ]
   }
 ];
+
+const countryFilters = ["全部", "英国", "美国", "加拿大", "澳洲", "新西兰", "欧洲", "日本", "新加坡", "中国香港", "通用"];
+const audienceFilters = ["全部", "学生", "在职", "游客", "商务", "家人"];
+const templateTypeFilters = ["全部", "留学申请", "学生签证", "旅游签", "商务/访友", "住宿行前"];
+
+function getTemplateTags(template: (typeof templateCards)[number]) {
+  const text = `${template.title} ${template.description} ${template.meta}`;
+  const countries = new Set<string>();
+  const audiences = new Set<string>();
+  const types = new Set<string>();
+
+  if (text.includes("英国")) countries.add("英国");
+  if (text.includes("美国")) countries.add("美国");
+  if (text.includes("加拿大")) countries.add("加拿大");
+  if (text.includes("澳洲")) countries.add("澳洲");
+  if (text.includes("新西兰")) countries.add("新西兰");
+  if (text.includes("日本")) countries.add("日本");
+  if (text.includes("新加坡")) countries.add("新加坡");
+  if (text.includes("香港")) countries.add("中国香港");
+  if (["申根", "欧洲", "德国", "法国", "荷兰", "爱尔兰", "西班牙", "意大利"].some((word) => text.includes(word))) countries.add("欧洲");
+  if (["住宿", "行前"].some((word) => text.includes(word))) countries.add("通用");
+
+  if (["学生", "留学", "学习", "Student", "F-1", "500", "Study"].some((word) => text.includes(word))) audiences.add("学生");
+  if (text.includes("在职")) audiences.add("在职");
+  if (["旅游", "访客", "探亲"].some((word) => text.includes(word))) audiences.add("游客");
+  if (["商务", "会议", "展会"].some((word) => text.includes(word))) audiences.add("商务");
+  if (["探亲", "访友", "家庭"].some((word) => text.includes(word))) audiences.add("家人");
+
+  if (text.includes("留学申请")) types.add("留学申请");
+  if (["学生签证", "学习许可", "学生准证", "F-1", "500"].some((word) => text.includes(word))) types.add("学生签证");
+  if (["旅游签", "访客签证", "B1/B2", "600"].some((word) => text.includes(word))) types.add("旅游签");
+  if (["商务", "访友", "探亲"].some((word) => text.includes(word))) types.add("商务/访友");
+  if (["住宿", "行前"].some((word) => text.includes(word))) types.add("住宿行前");
+
+  return { countries, audiences, types };
+}
+
+function matchesFilter(values: Set<string>, selected: string) {
+  return selected === "全部" || values.has(selected);
+}
 
 function slugify(email: string) {
   return email.split("@")[0].toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || `user-${Date.now()}`;
@@ -260,6 +572,9 @@ export default function HomePage() {
   const [message, setMessage] = useState("");
   const [busyTemplate, setBusyTemplate] = useState("");
   const [previewTemplate, setPreviewTemplate] = useState<(typeof templateCards)[number] | null>(null);
+  const [countryFilter, setCountryFilter] = useState("全部");
+  const [audienceFilter, setAudienceFilter] = useState("全部");
+  const [templateTypeFilter, setTemplateTypeFilter] = useState("全部");
   const [bulkMode, setBulkMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [bulkStatus, setBulkStatus] = useState("已确认");
@@ -291,6 +606,15 @@ export default function HomePage() {
       notApplicable: materials.filter((item) => item.status === "不适用").length
     };
   }, [materials]);
+
+  const filteredTemplates = useMemo(() => {
+    return templateCards.filter((template) => {
+      const tags = getTemplateTags(template);
+      return matchesFilter(tags.countries, countryFilter)
+        && matchesFilter(tags.audiences, audienceFilter)
+        && matchesFilter(tags.types, templateTypeFilter);
+    });
+  }, [countryFilter, audienceFilter, templateTypeFilter]);
 
   async function handleAuth(event: FormEvent) {
     event.preventDefault();
@@ -506,12 +830,12 @@ export default function HomePage() {
         <section className="hero hero-landing">
           <div className="hero-copy">
             <p className="eyebrow">Study Abroad Planner</p>
-            <h1>留学材料助手</h1>
-            <p className="subtle">把申请、签证、住宿和行前材料放在一个清晰的进度页里。登录后，每个人都有自己的清单。</p>
+            <h1>留学与签证材料助手</h1>
+            <p className="subtle">从学校申请到学生签证、旅游签、住宿和行前准备，把跨国材料整理成一个清晰的进度页。</p>
             <div className="feature-strip" aria-label="核心功能">
-              <span>时间线清单</span>
+              <span>全球模板库</span>
               <span>家人只读分享</span>
-              <span>云端同步</span>
+              <span>云端同步清单</span>
             </div>
           </div>
           <form className="card panel auth-box" onSubmit={handleAuth}>
@@ -543,21 +867,21 @@ export default function HomePage() {
                 <span />
                 <div>
                   <strong>提交申请材料</strong>
-                  <p>成绩单、语言成绩、个人陈述</p>
+                  <p>成绩单、语言成绩、文书和推荐信</p>
                 </div>
               </div>
               <div className="preview-step">
                 <span />
                 <div>
-                  <strong>等待 Offer</strong>
-                  <p>Conditional Offer / Unconditional Offer</p>
+                  <strong>选择目的地模板</strong>
+                  <p>英国、美国、加拿大、澳洲、欧洲和亚洲</p>
                 </div>
               </div>
               <div className="preview-step">
                 <span />
                 <div>
-                  <strong>CAS 与签证</strong>
-                  <p>CAS、IHS、TB 检测、签证申请表</p>
+                  <strong>签证与行前</strong>
+                  <p>学生签、旅游签、住宿、保险和到校注册</p>
                 </div>
               </div>
             </div>
@@ -574,7 +898,7 @@ export default function HomePage() {
             </article>
             <article>
               <strong>按流程推进</strong>
-              <p>材料按申请、Offer、签证、住宿和行前阶段展示，不再只是一堆待办。</p>
+              <p>模板按国家、人群和签证类型筛选，再按时间线放进你的个人清单。</p>
             </article>
           </div>
         </section>
@@ -588,7 +912,7 @@ export default function HomePage() {
         <div className="dashboard-copy">
           <p className="eyebrow">Study Abroad Planner</p>
           <h1>我的留学材料</h1>
-          <p className="subtle">按申请、Offer、签证、住宿和行前阶段推进。你更新进度，家人只读查看。</p>
+          <p className="subtle">按国家、申请阶段、签证类型和行前任务整理材料。你更新进度，家人只读查看。</p>
           <div className="quick-actions">
             <button className="button button-primary" type="button" onClick={addSeedMaterials}>添加默认材料</button>
             <button className="button button-soft" type="button" onClick={copyShareUrl}>复制分享链接</button>
@@ -632,9 +956,22 @@ export default function HomePage() {
           </div>
           <span>收起 / 展开</span>
         </summary>
-        <p className="section-note">点一下模板先预览材料；再点同一个模板可收起预览。确认需要后，再添加到正式清单。</p>
+        <p className="section-note">点一下模板先预览材料；再点同一个模板可收起预览。可以先用筛选缩小范围，再添加到正式清单。</p>
+        <div className="template-filters" aria-label="模板筛选">
+          <SegmentedFilter label="国家 / 地区" value={countryFilter} options={countryFilters} onChange={setCountryFilter} />
+          <SegmentedFilter label="人群" value={audienceFilter} options={audienceFilters} onChange={setAudienceFilter} />
+          <SegmentedFilter label="类型" value={templateTypeFilter} options={templateTypeFilters} onChange={setTemplateTypeFilter} />
+        </div>
+        <div className="template-result-row">
+          <span>{filteredTemplates.length} 个模板</span>
+          {(countryFilter !== "全部" || audienceFilter !== "全部" || templateTypeFilter !== "全部") && (
+            <button className="button button-plain" type="button" onClick={() => { setCountryFilter("全部"); setAudienceFilter("全部"); setTemplateTypeFilter("全部"); }}>
+              清空筛选
+            </button>
+          )}
+        </div>
         <div className="template-grid">
-          {templateCards.map((template) => (
+          {filteredTemplates.map((template) => (
             <button
               className={`template-card ${previewTemplate?.title === template.title ? "template-card-active" : ""}`}
               type="button"
@@ -649,6 +986,12 @@ export default function HomePage() {
             </button>
           ))}
         </div>
+        {!filteredTemplates.length && (
+          <div className="empty-state">
+            <strong>没有找到匹配模板</strong>
+            <p>可以清空筛选，或者换一个国家、身份、签证类型组合。</p>
+          </div>
+        )}
         {previewTemplate && (
           <div className="template-preview">
             <div className="template-preview-head">
@@ -793,5 +1136,25 @@ function Select({ label, value, options, onChange }: { label: string; value: str
         {options.map((option) => <option value={option} key={option}>{option}</option>)}
       </select>
     </label>
+  );
+}
+
+function SegmentedFilter({ label, value, options, onChange }: { label: string; value: string; options: string[]; onChange: (value: string) => void }) {
+  return (
+    <div className="filter-group">
+      <span>{label}</span>
+      <div className="filter-scroll">
+        {options.map((option) => (
+          <button
+            className={value === option ? "filter-chip filter-chip-active" : "filter-chip"}
+            type="button"
+            key={option}
+            onClick={() => onChange(option)}
+          >
+            {option}
+          </button>
+        ))}
+      </div>
+    </div>
   );
 }
