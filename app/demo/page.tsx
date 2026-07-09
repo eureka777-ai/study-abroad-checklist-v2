@@ -13,6 +13,7 @@ const demoMaterials = [
 
 const stages = ["申请准备", "CAS 与签证", "住宿与付款", "行前准备"];
 const readyStatuses = ["已完成", "已上传", "已确认"];
+const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || "";
 
 export default function DemoPage() {
   const required = demoMaterials.filter((item) => item.level === "必需" && item.status !== "不适用");
@@ -27,8 +28,8 @@ export default function DemoPage() {
           <h1>英国学生签证示例清单</h1>
           <p className="subtle">不用登录也可以先看看：材料会按阶段整理，并标出必需、视情况需要和可选。</p>
           <div className="quick-actions">
-            <a className="button button-primary" href="/">免费开始整理材料</a>
-            <a className="button button-soft" href="/">返回首页</a>
+            <a className="button button-primary" href={`${BASE_PATH}/`}>免费开始整理材料</a>
+            <a className="button button-soft" href={`${BASE_PATH}/`}>返回首页</a>
           </div>
         </div>
 

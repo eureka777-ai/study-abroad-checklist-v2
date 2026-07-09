@@ -56,6 +56,7 @@ type CustomTemplate = {
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || "";
 const FEEDBACK_URL = "https://example.com/feedback";
 const CUSTOM_TEMPLATE_PREFIX = "pathfolio-custom-templates";
 
@@ -671,7 +672,7 @@ export default function HomePage() {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [bulkStatus, setBulkStatus] = useState("已确认");
 
-  const shareUrl = profile ? `${window.location.origin}/share/${profile.share_slug}` : "";
+  const shareUrl = profile ? `${window.location.origin}${BASE_PATH}/share/${profile.share_slug}` : "";
   useEffect(() => {
     const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""));
     const token = hash.get("access_token");
@@ -771,7 +772,7 @@ export default function HomePage() {
     setMessage("");
     try {
       if (authMode === "forgot") {
-        const redirectTo = `${window.location.origin}${window.location.pathname}`;
+        const redirectTo = `${window.location.origin}${BASE_PATH || ""}${window.location.pathname.replace(BASE_PATH, "")}`;
         await authRequest(`recover?redirect_to=${encodeURIComponent(redirectTo)}`, { email });
         setMessage("如果这个邮箱已注册，我们会发送一封重置密码邮件。请去邮箱里点链接。");
         return;
@@ -1255,7 +1256,7 @@ export default function HomePage() {
             <p className="subtle">从学校申请到学生签证、旅游签、住宿和行前准备，把跨国材料整理成一个清晰的进度页。</p>
             <div className="hero-actions">
               <a className="button button-primary" href="#auth">免费开始整理材料</a>
-              <a className="button button-soft" href="/demo">查看示例清单</a>
+              <a className="button button-soft" href={`${BASE_PATH}/demo`}>查看示例清单</a>
             </div>
             <div className="feature-strip" aria-label="核心功能">
               <span>全球模板库</span>
@@ -1692,7 +1693,7 @@ export default function HomePage() {
             <div className="empty-actions">
               <button className="button button-primary" type="button" onClick={openAddMaterialModal}>添加第一项材料</button>
               <button className="button button-soft" type="button" onClick={scrollToTemplates}>从模板添加</button>
-              <a className="button button-plain" href="/demo">查看示例清单</a>
+              <a className="button button-plain" href={`${BASE_PATH}/demo`}>查看示例清单</a>
             </div>
           </div>
         )}
