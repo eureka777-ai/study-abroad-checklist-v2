@@ -1404,6 +1404,44 @@ textarea {
   margin-top: 16px;
 }
 
+.legal-notice {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+  margin: 28px 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: var(--shadow);
+  padding: 24px 28px;
+  backdrop-filter: blur(18px);
+}
+
+.legal-notice h2 {
+  margin: 0;
+  color: var(--text);
+  font-size: 24px;
+  line-height: 1.15;
+}
+
+.legal-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.legal-grid p {
+  min-height: 100%;
+  margin: 0;
+  border-radius: 20px;
+  background: rgba(245, 245, 247, 0.9);
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.65;
+  padding: 16px;
+}
+
 .floating-actions {
   position: fixed;
   right: 22px;
@@ -1445,6 +1483,8 @@ textarea {
   .timeline-group,
   .material-grid,
   .template-grid,
+  .legal-notice,
+  .legal-grid,
   .preview-material-grid {
     grid-template-columns: 1fr;
   }

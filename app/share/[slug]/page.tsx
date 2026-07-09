@@ -134,6 +134,18 @@ export default function SharePage() {
           </div>
         </section>
       )}
+
+      <section className="legal-notice" aria-label="只读分享说明">
+        <div>
+          <p className="eyebrow" lang="en">family view</p>
+          <h2>只读查看说明</h2>
+        </div>
+        <div className="legal-grid">
+          <p>这个页面只能查看材料进度，不能修改清单内容。</p>
+          <p>材料要求可能随学校、使馆或签证政策变化，请以官方通知为准。</p>
+          <p>如果链接不小心发给了不该看到的人，建议回到本人账号里重新生成分享链接。</p>
+        </div>
+      </section>
     </main>
   );
 }

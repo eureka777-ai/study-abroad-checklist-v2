@@ -1216,6 +1216,22 @@ export default function HomePage() {
     );
   }
 
+  function renderLegalNotice() {
+    return (
+      <section className="legal-notice" aria-label="使用说明和隐私提示">
+        <div>
+          <p className="eyebrow" lang="en">privacy note</p>
+          <h2>使用前的小提醒</h2>
+        </div>
+        <div className="legal-grid">
+          <p>材料清单只用于个人整理参考，最终要求请以学校、使馆、移民局或官方签证网站为准。</p>
+          <p>建议只记录材料状态和官方入口，不要上传或填写护照、身份证、银行流水等敏感原件信息。</p>
+          <p>你的账号数据用于同步个人清单；家人分享链接为只读页面，可以查看进度，但不能编辑。</p>
+        </div>
+      </section>
+    );
+  }
+
   if (!SUPABASE_URL || !SUPABASE_KEY) {
     return (
       <main className="page">
@@ -1223,6 +1239,7 @@ export default function HomePage() {
           <h1 className="text-3xl font-bold">还差环境变量</h1>
           <p className="subtle mt-3">请先创建 .env.local，填入 Supabase URL 和 Publishable key。</p>
         </section>
+        {renderLegalNotice()}
         {renderFloatingActions(false)}
       </main>
     );
@@ -1351,6 +1368,7 @@ export default function HomePage() {
             </article>
           </div>
         </section>
+        {renderLegalNotice()}
         {renderFloatingActions(false)}
       </main>
     );
@@ -1724,6 +1742,7 @@ export default function HomePage() {
           })}
         </div>
       </details>
+      {renderLegalNotice()}
       {renderFloatingActions(true)}
     </main>
   );

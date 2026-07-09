@@ -95,6 +95,18 @@ export default function DemoPage() {
           })}
         </div>
       </section>
+
+      <section className="legal-notice" aria-label="使用说明和隐私提示">
+        <div>
+          <p className="eyebrow" lang="en">privacy note</p>
+          <h2>使用前的小提醒</h2>
+        </div>
+        <div className="legal-grid">
+          <p>这是示例清单，只用于理解产品流程。正式申请时，请以学校、使馆、移民局或官方签证网站为准。</p>
+          <p>真实使用时建议只记录材料状态和官方入口，不要填写护照、身份证、银行流水等敏感原件信息。</p>
+          <p>家人分享链接是只读页面，可以查看进度，但不能编辑你的清单。</p>
+        </div>
+      </section>
     </main>
   );
 }
