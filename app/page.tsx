@@ -1248,15 +1248,15 @@ export default function HomePage() {
 
   if (!session) {
     return (
-      <main className="page">
+      <main className="page landing-page">
         <section className="hero hero-landing">
           <div className="hero-copy">
             <p className="eyebrow" lang="en">pathfolio</p>
-            <h1>从申请到签证，一页管理所有材料</h1>
-            <p className="subtle">从学校申请到学生签证、旅游签、住宿和行前准备，把跨国材料整理成一个清晰的进度页。</p>
+            <h1>材料进度，一页看清</h1>
+            <p className="subtle">选择模板，记录进度，分享给家人查看。</p>
             <div className="hero-actions">
-              <a className="button button-primary" href="#auth">免费开始整理材料</a>
-              <a className="button button-soft" href={`${BASE_PATH}/demo`}>查看示例清单</a>
+              <a className="button button-primary" href="#auth">开始整理</a>
+              <a className="button button-soft" href={`${BASE_PATH}/demo`}>看示例</a>
             </div>
             <div className="feature-strip" aria-label="核心功能">
               <span>全球模板库</span>
@@ -1279,7 +1279,7 @@ export default function HomePage() {
             <form className="card panel auth-box" id="auth" onSubmit={handleAuth}>
               <h2 className="text-2xl font-bold">{authMode === "login" ? "登录" : authMode === "signup" ? "注册" : "找回密码"}</h2>
               <p className="auth-hint">
-                {authMode === "forgot" ? "输入注册邮箱，我们会发送一封重置密码邮件。" : "每个用户登录后都有自己的云端清单。"}
+                {authMode === "forgot" ? "输入邮箱，我们会发送重置邮件。" : "登录后，你的清单会同步保存。"}
               </p>
               <input className="input" type="email" placeholder="邮箱" value={email} onChange={(e) => setEmail(e.target.value)} required />
               {authMode !== "forgot" && (
@@ -1301,7 +1301,7 @@ export default function HomePage() {
           )}
         </section>
 
-        <section className="parent-story">
+        <section className="parent-story landing-extra">
           <div>
             <p className="eyebrow">Family Share</p>
             <h2>爸妈总问材料办到哪了？</h2>
@@ -1317,7 +1317,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="landing-showcase">
+        <section className="landing-showcase landing-extra">
           <div className="preview-board">
             <div className="preview-header">
               <div>

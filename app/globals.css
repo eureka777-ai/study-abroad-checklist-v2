@@ -332,6 +332,10 @@ textarea {
   margin-bottom: 18px;
 }
 
+.landing-page {
+  padding-bottom: 92px;
+}
+
 .hero-copy {
   display: grid;
   gap: 18px;
@@ -1498,17 +1502,113 @@ textarea {
     padding-top: 16px;
   }
 
+  .landing-page {
+    width: min(100% - 28px, 460px);
+    padding-top: max(14px, env(safe-area-inset-top));
+    padding-bottom: max(116px, calc(env(safe-area-inset-bottom) + 116px));
+  }
+
   .hero {
     min-height: auto;
     padding-top: 18px;
   }
 
   .hero-landing {
+    gap: 16px;
     min-height: auto;
+    align-items: start;
+    margin-bottom: 12px;
+    padding-top: 6px;
   }
 
   .hero h1 {
     font-size: clamp(44px, 14vw, 64px);
+  }
+
+  .hero-landing h1 {
+    max-width: 8em;
+    margin-bottom: 8px;
+    font-size: clamp(42px, 13vw, 58px);
+    line-height: 0.98;
+  }
+
+  .hero-copy {
+    gap: 12px;
+  }
+
+  .hero-landing .eyebrow {
+    margin-bottom: 0;
+    font-size: 22px;
+  }
+
+  .hero-landing .subtle {
+    max-width: 22em;
+    font-size: 15px;
+    line-height: 1.55;
+  }
+
+  .hero-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .hero-actions .button {
+    min-height: 42px;
+    padding: 8px 12px;
+    text-align: center;
+    font-size: 14px;
+  }
+
+  .feature-strip {
+    display: none;
+  }
+
+  .landing-extra {
+    display: none;
+  }
+
+  .auth-box {
+    max-width: none;
+    gap: 10px;
+    padding: 18px;
+    border-radius: 24px;
+  }
+
+  .auth-box h2 {
+    font-size: 30px;
+    line-height: 1.05;
+  }
+
+  .auth-hint {
+    margin: -2px 0 0;
+    font-size: 13px;
+  }
+
+  .auth-box .input {
+    min-height: 48px;
+    border-radius: 16px;
+    font-size: 16px;
+  }
+
+  .auth-box > .button {
+    min-height: 48px;
+  }
+
+  .auth-switches {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .auth-switches .button {
+    min-height: 40px;
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+
+  .landing-page .legal-notice {
+    display: none;
   }
 
   .panel {
@@ -1567,6 +1667,16 @@ textarea {
   .floating-actions {
     right: 14px;
     bottom: 14px;
+  }
+
+  .landing-page .floating-actions {
+    right: 14px;
+    bottom: max(86px, calc(env(safe-area-inset-bottom) + 86px));
+  }
+
+  .landing-page .floating-action-button {
+    padding: 9px 13px;
+    font-size: 13px;
   }
 
   .feedback-modal {
